@@ -1,0 +1,11 @@
+Use this final checklist.
+- [ ] I can create components and pass props independently.
+- [ ] I can explain state updates and re-renders clearly.
+- [ ] I can use the main Hooks and explain their dependencies.
+- [ ] I can fetch API data and handle loading, errors and empty results.
+- [ ] I can implement forms, search, filters and pagination.
+- [ ] I can build nested routes and protected routes.
+- [ ] I understand Context API and the basics of Redux Toolkit.
+- [ ] I can identify and fix unnecessary re-renders.
+- [ ] I can build a small React application without following a tutorial.
+- [ ] I can explain my code, trade-offs and debugging decisions.
