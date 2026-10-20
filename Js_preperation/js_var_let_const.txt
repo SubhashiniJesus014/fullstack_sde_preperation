@@ -1,0 +1,60 @@
+What are var, let, and const?
+
+var, let, and const are JavaScript keywords used to declare variables. They differ in their scoping rules, whether they allow redeclaration and reassignment, and how they behave during hoisting.
+
+The three main differences
+var
+Function-scoped
+Can be redeclared and reassigned. It is hoisted and initialized with undefined.
+
+let
+Block-scoped
+Cannot be redeclared in the same scope, but can be reassigned. It is hoisted but remains uninitialized until its declaration is evaluated.
+
+const
+Block-scoped
+Cannot be redeclared in the same scope or reassigned. It must be initialized when declared.
+
+Redeclaration vs reassignment
+These two terms are frequently confused in interviews.
+- Redeclaration: Declaring a variable with the same name again in the same scope.
+- Reassignment: Giving a previously declared variable a new value.
+
+A. var — both are allowed
+var score = 10;
+var score = 20;  // Redeclaration allowed
+score = 30;      // Reassignment allowed
+console.log(score);
+
+Output:
+30
+
+B. let — reassignment allowed, redeclaration not allowed
+let score = 10;
+score = 20;  // Allowed
+console.log(score); // 20
+
+C. Const - In JavaScript, const is used to declare a variable whose value cannot be reassigned after initialization.
+
+It was introduced in ES6 (2015).
+
+example of const -
+const age = 25;
+
+console.log(age); // 25
+
+Here:
+- const declares the variable.
+- age is the variable name.
+- 25 is the assigned value.
+Once you declare age using const, you cannot assign a new value to it.
+
+const age = 25;
+
+age = 30; // Error!
+Why? Because const does not allow reassignment.
+
+Remember this simple rule:
+- Use const by default.
+- Use let when you need to reassign a variable.
+- Avoid var in modern JavaScript unless you specifically need its behavior.

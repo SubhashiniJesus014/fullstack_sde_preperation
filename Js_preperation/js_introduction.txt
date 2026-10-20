@@ -1,0 +1,245 @@
+Javascript is a high level,dynamically typed, multi paradigm 
+programming language primarily used to build interactive and
+dynamic web applications. It supports event-driven, asynchronous 
+programming and can execute in browsers as well as server-side
+environments such as Node.js.
+
+Now, understand each word in your definition
+
+1. High-level programming language
+Real-world meaning: You can write instructions in a human-readable way 
+without manually managing most low-level computer operations.
+example - 
+
+let price = 1000;
+let quantity = 2;
+
+console.log(price * quantity);
+Output: 2000
+
+2. Dynamically typed
+Real-world meaning: A variable can hold 
+different types of values at different times.
+example -
+
+let paymentStatus = false;
+paymentStatus = "Payment successful";
+console.log(paymentStatus);
+Output: Payment successful
+
+Initially, paymentStatus holds a Boolean value. Later, it holds a string. 
+JavaScript allows this reassignment because the variable is not restricted to one declared type.
+
+3. Multi-paradigm
+Real-world meaning: JavaScript lets you solve a problem using 
+different programming styles.
+
+For example, in an online shopping application, you could use:
+*Functions to calculate a product's price.
+*Objects to represent a product and its properties.
+*Classes when an object-oriented design is useful.
+*Array methods such as map() and filter() to display and search products.
+
+4. Event-driven
+Real-world meaning: Your code responds to actions or events.
+For example, when a customer clicks the Add to Cart button, a click event triggers a function.
+
+function addToCart() {
+    console.log("Product added to cart!");
+}
+In a real webpage, you would connect this function to the button's click event. 
+Clicking the button would then invoke the function.
+
+5. Asynchronous programming
+Real-world meaning: Your application can continue doing useful work while waiting for an operation, 
+such as a server response, to finish.
+
+Imagine you open a product page. The browser requests product details from the server. JavaScript can handle 
+that request asynchronously instead of blocking the main thread while waiting for the response.
+
+async function getProduct() {
+    const response = await fetch("/api/products/101");
+    const product = await response.json();
+
+    console.log(product);
+}
+Here, fetch() requests product data, and await waits for the promise to settle within the asynchronous function
+without blocking the main JavaScript thread.
+
+6. Runs in browsers and Node.js
+
+Real-world meaning: You can use JavaScript on both sides of an application.
+
+Frontend — Browser
+JavaScript + React: displays products and handles user interactions.
+Backend — Node.js + Express.js
+Processes API requests, applies business rules, and communicates with the database.
+Database — MongoDB
+Stores and retrieves product and order data.
+
+This is the basic idea behind a MERN application. React, Node.js, and Express.js use JavaScript, while MongoDB is the database.
+
+JavaScript Architecture Diagram -
+
+  JAVASCRIPT CODE
+                        |
+                        v
+              +--------------------+
+              |  JavaScript Engine |
+              +--------------------+
+                        |
+              +--------------------+
+              |       Parser       |
+              | Converts code into |
+              | an internal format |
+              +--------------------+
+                        |
+                        v
+              +--------------------+
+              | Execution Context  |
+              | and Call Stack     |
+              +--------------------+
+                        |
+             +----------+----------+
+             |                     |
+             v                     v
+      +-------------+       +---------------+
+      | Memory Heap |       | Runtime APIs  |
+      | Objects and |       | Timers, DOM,  |
+      | Data        |       | Network APIs  |
+      +-------------+       +---------------+
+                                    |
+                                    v
+                           +------------------+
+                           | Callback Queues  |
+                           |                  |
+                           | Microtask Queue  |
+                           | Task Queue       |
+                           +------------------+
+                                    |
+                                    v
+                           +------------------+
+                           |   Event Loop     |
+                           +------------------+
+                                    |
+                                    v
+                           +------------------+
+                           |    Call Stack    |
+                           +------------------+
+
+Note: Runtime APIs and the event loop are provided by the host environment, 
+such as a browser or Node.js, rather than being entirely part of the JavaScript engine.
+
+Components of JavaScript Architecture -
+
+**JavaScript Engine**
+The JavaScript engine is responsible for parsing and executing JavaScript code.
+
+Responsibilities:
+
+*Parses the source code.
+*Converts code into an internal representation.
+*Executes code using interpretation and compilation techniques.
+*Optimizes frequently executed code.
+*Manages memory and garbage collection.
+
+Examples:
+
+V8 — Google Chrome and Node.js.
+SpiderMonkey — Mozilla Firefox.
+JavaScriptCore — Safari.
+
+**Execution Context**
+An execution context is the environment in which JavaScript code executes.
+Types:
+*Global Execution Context: Created for the global code.
+*Function Execution Context: Created when a function is called.
+*Eval Execution Context: Associated with code executed using eval().
+
+An execution context maintains information such as variable bindings, the current execution state,
+and the scope in which code runs.
+
+**Call Stack**
+The call stack tracks function execution using the Last In, First Out (LIFO) principle.
+Example:
+
+function first() {
+    second();
+}
+
+function second() {
+    console.log("Hello");
+}
+
+first();
+
+Execution order:
+
+*first() is pushed onto the call stack.
+*second() is pushed onto the call stack.
+*console.log() executes.
+*second() is removed from the stack.
+*first() is removed from the stack.
+
+**Memory Heap**
+The memory heap is an area used by the JavaScript engine to allocate memory for objects 
+and other dynamically allocated data.
+Example:
+
+let user = {
+    name: "Subhashini",
+    role: "Developer"
+};
+
+The object is stored in memory, and the variable user holds a reference to that object.
+JavaScript automatically manages memory through garbage collection, which can reclaim memory that is no longer reachable.
+
+**Runtime APIs**
+Runtime APIs are capabilities supplied by the host environment.
+
+Browser examples:
+DOM APIs
+setTimeout() and setInterval()
+fetch()
+Browser event handling
+
+Node.js examples:
+
+Timers
+File system APIs
+Networking APIs
+
+These capabilities allow JavaScript applications to interact with the browser, 
+the operating system, and external services.
+
+**Callback Queues**
+Queues hold callbacks that are ready to be executed when the JavaScript thread can process them.
+Microtask Queue:
+*Promise .then(), .catch(), and .finally() handlers.
+*queueMicrotask() callbacks.
+*Other microtask-based operations.
+
+**Task Queue**
+*Timer callbacks such as setTimeout().
+*Many event callbacks and other host-scheduled tasks.
+In browsers, the event loop processes microtasks at defined checkpoints and 
+selects tasks according to the event-loop rules.
+
+**Event Loop**
+The event loop coordinates queued work with JavaScript execution.
+Responsibilities:
+
+Allows the current synchronous JavaScript execution to finish.
+Processes pending microtasks at the appropriate checkpoint.
+Allows queued tasks to execute when the JavaScript thread is available.
+Helps the application respond to user interactions and asynchronous operations.
+The event loop does not execute JavaScript callbacks simultaneously on the same main thread.
+
+**How JavaScript Architecture Works**
+
+The developer writes JavaScript code.
+The JavaScript engine parses the code.
+The engine executes code using execution contexts and the call stack.
+Asynchronous operations may be handled by runtime APIs.
+When callbacks become eligible to run, they are scheduled through the appropriate queues.
+The event loop coordinates when queued callbacks can execute on the JavaScript thread.

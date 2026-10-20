@@ -1,0 +1,434 @@
+destructuring -
+
+The destructuring syntax is a JavaScript syntax that makes it possible to unpack values
+from arrays, or properties from objects, into distinct variables. It can be used in locations that receive data 
+(such as the left-hand side of an assignment or anywhere that creates new identifier bindings).
+
+const [a, b] = array;
+const [a, , b] = array;
+const [a = aDefault, b] = array;
+const [a, b, ...rest] = array;
+const [a, , b, ...rest] = array;
+const [a, b, ...{ pop, push }] = array;
+const [a, b, ...[c, d]] = array;
+
+const { a, b } = obj;
+const { a: a1, b: b1 } = obj;
+const { a: a1 = aDefault, b = bDefault } = obj;
+const { a, b, ...rest } = obj;
+const { a: a1, b: b1, ...rest } = obj;
+const { [key]: a } = obj;
+
+let a, b, a1, b1, c, d, rest, pop, push;
+[a, b] = array;
+[a, , b] = array;
+[a = aDefault, b] = array;
+[a, b, ...rest] = array;
+[a, , b, ...rest] = array;
+[a, b, ...{ pop, push }] = array;
+[a, b, ...[c, d]] = array;
+
+({ a, b } = obj); // parentheses are required
+({ a: a1, b: b1 } = obj);
+({ a: a1 = aDefault, b = bDefault } = obj);
+({ a, b, ...rest } = obj);
+({ a: a1, b: b1, ...rest } = obj);
+
+
+***basic destructuring***
+
+const array = [10, 20, 30];
+
+const [a, b] = array;
+
+console.log(a); // 10
+console.log(b); // 20
+
+
+***Example 2: Skipping elements***
+
+const array = [10, 20, 30];
+
+const [a, , b] = array;
+
+console.log(a); // 10
+console.log(b); // 30
+
+***Example 3: Default values***
+
+const array = [10];
+
+const [a = 100, b = 200] = array;
+
+console.log(a); // 10
+console.log(b); // 200
+
+A default value is used when the corresponding array element is undefined or missing.
+
+
+***Important distinction:
+const [x = 100] = [0];         // x = 0
+const [y = 100] = [undefined]; // y = 100
+const [z = 100] = [null];      // z = null
+
+The default does not replace 0, false, "", or null.
+SDE-1 interview point: Destructuring defaults apply to undefined, not to every falsy value.
+
+Example 4: Rest syntax (...rest)
+
+const array = [10, 20, 30, 40, 50];
+
+const [a, b, ...rest] = array;
+
+console.log(a);    // 10
+console.log(b);    // 20
+console.log(rest); // [30, 40, 50]
+
+
+***Destructuring the rest into an object
+
+const array = [10, 20, 30, 40];
+const [a, b, ...{ pop, push }] = array;
+
+console.log(a);    // 10
+console.log(b);    // 20
+console.log(pop);  // function
+console.log(push); // function
+
+2. Object destructuring
+Object destructuring extracts values using property names, not positions.
+
+***Example 1: Basic object destructuring
+
+const user = {
+  name: "Subhashini",
+  age: 24,
+  role: "Developer"
+};
+
+const { name, age } = user;
+
+console.log(name); // "Subhashini"
+console.log(age);  // 24
+
+Example 2: Renaming variables
+Your code:
+
+const user = {
+  name: "Subhashini",
+  age: 24
+};
+
+const { name: a1, age: b1 } = user;
+
+console.log(a1); // "Subhashini"
+console.log(b1); // 24
+
+Here, name: a1 means:
+- Read the name property from the object.
+- Store its value in a variable called a1.
+It does not rename the object's property.
+
+The general syntax is:
+const { propertyName: variableName } = object;
+
+**Project use case: 
+An API returns fields that you want to use with shorter variable names.
+
+const response = {
+  user_name: "Subhashini",
+  email_address: "user@example.com"
+};
+
+const {
+  user_name: username,
+  email_address: email
+} = response;
+
+console.log(username);
+console.log(email);
+
+This is particularly useful when API property names differ from the names you prefer in your application.
+
+Example 3: Default values in objects
+Your code:
+
+const user = {
+  name: "Subhashini"
+};
+
+const {
+  name: a1 = "Guest",
+  age = 22
+} = user;
+
+console.log(a1); // "Subhashini"
+console.log(age); // 22
+
+Example 4: Object rest syntax
+
+const user = {
+  name: "Subhashini",
+  age: 24,
+  password: "secret123",
+  role: "Developer"
+};
+
+const { password, ...rest } = user;
+
+console.log(password); // "secret123"
+console.log(rest);
+// { name: "Subhashini", age: 24, role: "Developer" }
+
+Here, password is extracted separately. ...rest collects all the other enumerable own properties into a new object.
+
+***Project use case: removing a property without modifying the original object.
+
+const { password, ...safeUser } = user;
+
+console.log(safeUser);
+
+***Example 5: Renaming properties and using rest together
+
+const user = {
+  name: "Subhashini",
+  age: 24,
+  role: "Developer",
+  city: "Bengaluru"
+};
+
+const {
+  name: username,
+  age: userAge,
+  ...rest
+} = user;
+
+console.log(username); // "Subhashini"
+console.log(userAge);  // 24
+console.log(rest);
+// { role: "Developer", city: "Bengaluru" }
+
+
+****Use case 1: Destructuring API responses****
+
+Imagine your backend returns this JSON:
+
+const response = {
+  success: true,
+  data: {
+    id: 101,
+    name: "Laptop",
+    price: 50000
+  }
+};
+
+const {
+  success,
+  data: { name, price }
+} = response;
+
+console.log(success); // true
+console.log(name);    // "Laptop"
+console.log(price);   // 50000
+
+This is nested object destructuring.
+The pattern data: { name, price } accesses the data property and extracts its name and price properties.
+
+Notice that it does not create a variable called data. If you need the whole data object too, you can write:
+
+const {
+  data,
+  data: { name, price }
+} = response;
+
+Now you have all three variables: data, name, and price.
+
+*****Use case 2: React props*****
+
+Suppose you create a reusable product card.
+
+function ProductCard({ name, price }) {
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>Price: ₹{price}</p>
+    </div>
+  );
+}
+
+export default ProductCard;
+
+You can use it like this:
+
+<ProductCard name="Laptop" price={50000} />
+
+React passes the props object to the function. The function parameter { name, price } extracts the two properties.
+Without destructuring, you could write:
+
+function ProductCard(props) {
+  return (
+    <div>
+      <h2>{props.name}</h2>
+      <p>Price: ₹{props.price}</p>
+    </div>
+  );
+}
+
+*****Use case 3: React useState****
+
+You have probably seen this pattern in almost every React project:
+
+const [count, setCount] = useState(0);
+
+This is array destructuring.
+useState(0) returns an array containing the current state value and a function to update it.
+Conceptually:
+
+const result = useState(0);
+
+const count = result[0];
+const setCount = result[1];
+
+The first element is the state value; the second is the setter function.
+We use array destructuring because the positions have a fixed meaning, 
+and we can choose meaningful names for each value.
+
+Use case 4: Express.js request data
+In a MERN application, the frontend may send product information to an Express backend.
+
+app.post("/products", (req, res) => {
+  const { name, price, category } = req.body;
+
+  res.json({
+    message: "Product received",
+    name,
+    price,
+    category
+  });
+});
+
+If the request body is:
+
+{
+  "name": "Laptop",
+  "price": 50000,
+  "category": "Electronics"
+}
+
+Destructuring extracts these fields from req.body.
+In a real application, you must also validate the request body before trusting its values.
+
+Use case 5: Function parameters
+You can destructure an object directly in a function parameter.
+
+function calculateTotal({ price, quantity }) {
+  return price * quantity;
+}
+
+console.log(calculateTotal({
+  price: 500,
+  quantity: 3
+})); // 1500
+
+This is common when a function accepts several related options.
+Compare it with the longer version:
+
+function calculateTotal(product) {
+  return product.price * product.quantity;
+}
+
+Both work. Destructuring is especially convenient when you need only a few properties.
+Important: The function expects an object. Calling calculateTotal() with no argument causes a TypeError,
+because JavaScript cannot extract properties from undefined.
+
+function showUser({ name = "Guest" } = {}) {
+  console.log(name);
+}
+
+showUser(); // "Guest"
+
+Here, the outer = {} handles a missing argument, 
+while the inner = "Guest" handles a missing or undefined name property.
+
+5. Nested destructuring: objects inside objects, arrays inside objects
+Real API responses often contain nested data.
+Nested objects
+
+const employee = {
+  name: "Sam",
+  address: {
+    city: "Bengaluru",
+    country: "India"
+  }
+};
+
+const {
+  name,
+  address: { city }
+} = employee;
+
+console.log(name); // "Sam"
+console.log(city); // "Bengaluru"
+
+Arrays inside objects
+
+const student = {
+  name: "Sam",
+  marks: [85, 90, 95]
+};
+
+const {
+  name,
+  marks: [first, second]
+} = student;
+
+console.log(name);   // "Sam"
+console.log(first);  // 85
+console.log(second); // 90
+
+This combines object and array destructuring.
+
+Objects inside arrays
+
+const products = [
+  { name: "Laptop", price: 50000 },
+  { name: "Phone", price: 20000 }
+];
+
+const [{ name: firstProduct }, { price: secondPrice }] = products;
+
+console.log(firstProduct); // "Laptop"
+console.log(secondPrice);  // 20000
+
+You are extracting properties from objects that are themselves elements of an array.
+These patterns are useful when processing API responses, although very deep destructuring can make code harder to read.
+Prefer clarity over writing everything in one line.
+
+6. Destructuring versus the spread operator
+This is a common source of confusion in interviews.
+Both use ..., but they serve different purposes depending on where they appear.
+
+Rest syntax: collects remaining values
+
+const [first, ...rest] = [10, 20, 30];
+
+console.log(rest); // [20, 30]
+
+****Spread syntax: expands values****
+
+const arr1 = [10, 20];
+const arr2 = [...arr1, 30];
+
+console.log(arr2); // [10, 20, 30]
+
+***Object examples***
+
+const user = { name: "Sam", age: 24 };
+
+const { name, ...rest } = user;
+// Rest: extracts remaining properties
+
+const updatedUser = { ...user, age: 25 };
+// Spread: copies properties into a new object, then overrides age
+
+One more important detail: object and array rest create new containers, but they do not deeply clone nested objects.

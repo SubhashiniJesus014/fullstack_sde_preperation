@@ -1,0 +1,121 @@
+What are data types in JavaScript?
+
+1. String
+Definition: A string is a primitive data type used to represent text. 
+It can be written using single quotes, double quotes, or backticks.
+
+let userName = "Subhashini";
+let email = 'user@example.com';
+let message = `Welcome, ${userName}`;
+
+console.log(message);
+// Welcome, Subhashini
+
+console.log(typeof userName);
+// string
+
+2. Number
+Definition: The Number type represents both integers and floating-point numbers.
+JavaScript does not have separate primitive types for integers and decimals.
+example -
+let price = 24999;
+let discount = 0.15;
+let finalPrice = price * (1 - discount);
+
+console.log(finalPrice); // 21249.15
+console.log(typeof price); // "number"
+
+Why is NaN a number?
+=>NaN means Not-a-Number. It is a special value within JavaScript's Number type 
+that represents an invalid numeric result.
+=>when you try to perform a mathematical operation that cannot produce a valid number, JavaScript may return NaN.
+
+Use Number.isNaN() when you specifically want to check for NaN.
+console.log(Number.isNaN(NaN));     // true
+console.log(Number.isNaN("hello")); // false
+
+3. BigInt
+Definition: BigInt represents integers larger than the range in which JavaScript's 
+Number type can safely represent every integer exactly.
+example -
+let bigNumber = 9007199254740993n;
+
+console.log(bigNumber);
+// 9007199254740993n
+
+console.log(typeof bigNumber);
+// "bigint"
+
+4. Boolean
+Definition: A Boolean represents a logical value: true or false.
+
+let isLoggedIn = true;
+let isPaymentSuccessful = false;
+
+console.log(typeof isLoggedIn); // "boolean"
+
+Value	 Result	 Reason
+0	     false	 Numeric zero is falsy
+"0"	     true	 Non-empty string
+""	     false	 Empty string
+"hello"	 true	 Non-empty string
+null	 false	 Falsy value
+undefined false	 Falsy value
+[]	      true   Empty arrays are truthy
+{}	      true	 Empty objects are truthy
+
+5. Undefined
+Definition: undefined is a primitive value generally used when a variable has been 
+declared but has not been assigned a value, or when a property or function result is missing.
+
+let user;
+
+console.log(user);        // undefined
+console.log(typeof user); // "undefined"
+
+6. Null
+Definition: null is a primitive value used to represent the intentional absence 
+of an object or value.
+
+let selectedAddress = null;
+console.log(selectedAddress); // null
+
+7. Symbol
+Definition: Symbol is a primitive data type used to create unique values, often as property 
+keys that should not accidentally collide with other keys.
+
+const id1 = Symbol("id");
+const id2 = Symbol("id");
+
+console.log(id1 === id2); // false
+console.log(typeof id1);  // "symbol"
+
+** Non-primitive data type: Object
+Definition: An object is a reference-type value that can hold properties as key-value pairs. 
+Objects are used to represent structured data and complex entities.
+
+const product = {
+    id: 101,
+    name: "Wireless Headphones",
+    price: 1999,
+    inStock: true
+};
+
+console.log(product.name);  // Wireless Headphones
+console.log(product.price); // 1999
+console.log(typeof product); // "object"
+
+typeof operator — 
+The typeof operator returns a string describing the type of a value.
+Value	        Output
+"Amazon"	   "string"
+100	           "number"
+100n	       "bigint"
+true	       "boolean"
+undefined	   "undefined"
+null	       "object" — historical quirk
+Symbol("id")	"symbol"
+{}	            "object"
+[]	            "object"
+function() {}	"function"
+NaN          	"number"

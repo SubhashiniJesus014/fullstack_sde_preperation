@@ -1,0 +1,210 @@
+What is Type Coercion in JavaScript?
+Type coercion is the process by which JavaScript converts a value from one data type to another,
+either automatically (implicit coercion) or explicitly (explicit conversion).
+
+For example:
+console.log("5" + 2); // "52"
+console.log("5" - 2); // 3
+
+Why are the outputs different when we use the same values?
+- With +, JavaScript converts the number 2 into a string and performs concatenation.
+- With -, JavaScript converts the string "5" into a number and performs subtraction.
+
+
+1. Implicit type coercion
+JavaScript automatically converts a value's type when evaluating an expression.
+console.log("10" - 5);
+// 5
+The string "10" is automatically converted to the number 10.
+
+2. Explicit type conversion
+The developer intentionally converts a value using functions such as Number(), String(), and Boolean().
+
+console.log(Number("10")); // 10
+console.log(String(25));   // "25"
+console.log(Boolean(1));   // true
+
+How JavaScript coerces values with operators
+A. The + operator
+The + operator can perform either addition or string concatenation.
+
+console.log(5 + 2);       // 7
+console.log("5" + 2);     // "52"
+console.log(5 + "2");     // "52"
+console.log("Hello" + 5); // "Hello5"
+
+Remember:
+- Number + number → numeric addition.
+- If string concatenation is triggered, the other value is converted to a string.
+
+B. The -, *, and / operators
+These operators perform numeric operations, so JavaScript generally converts operands to numbers.
+
+console.log("10" - 5); // 5
+console.log("10" * 2); // 20
+console.log("10" / 2); // 5
+
+Even though "10" is a string, JavaScript converts it to the number 10.
+
+C. A common interview trap
+console.log("10" + 5 - 2);
+
+Step-by-step evaluation:
+1. "10" + 5 → "105" because + concatenates.
+2. "105" - 2 → 103 because - converts "105" to a number.
+
+Output:
+103
+
+The key is to evaluate the expression from left to right while applying 
+each operator's rules.
+
+What is Equality in JavaScript?
+Equality is used to compare two values and determine whether they are equal. JavaScript has two main equality operators:
+- == — loose equality
+- === — strict equality
+There are also inequality operators: != and !==.
+
+**Loose equality (==)
+Interview-ready definition: Loose equality compares two values after performing type coercion when necessary.
+Example:
+console.log(5 == "5"); // true
+
+Why is the result true?
+- 5 is a number.
+- "5" is a string.
+- Since the types differ, JavaScript converts the string "5" to the number 5.
+- Now it compares 5 == 5, so the result is true.
+
+Another example:
+
+console.log(1 == true); // true
+JavaScript converts true to 1, so the comparison 
+becomes equivalent to 1 == 1.
+
+Strict equality (===)
+Interview-ready definition: Strict equality compares values
+without performing type coercion. Values of different types are not 
+equal under strict equality.
+
+Example:
+console.log(5 === "5"); // false
+
+Why?
+- 5 is a number.
+- "5" is a string.
+- The types are different, so strict equality returns false.
+
+Another example:
+console.log(1 === true); // false
+
+Important Equality Examples You Must Know
+Study the following outputs carefully. These are common JavaScript interview questions.
+
+Example 1: Number vs string
+console.log(10 == "10");  // true
+console.log(10 === "10"); // false
+
+== converts the string to a number; === does not.
+
+Example 2: Number vs Boolean
+console.log(0 == false);  // true
+console.log(0 === false); // false
+
+Example 3: String vs Boolean
+console.log("1" == true);  // true
+console.log("1" === true); // false
+
+For loose equality, the Boolean is converted to a number (true → 1), then the string "1" is converted to 1.
+
+Example 4: null vs undefined
+console.log(null == undefined);  // true
+console.log(null === undefined); // false
+
+These two values are specially treated as equal by ==, 
+but they remain different types.
+
+Example 5: Empty string vs zero
+console.log("" == 0);  // true
+console.log("" === 0); // false
+
+The empty string converts to the number 0 during this loose comparison.
+
+A critical exception: null and undefined
+Do not assume that null and undefined compare equal to everything that converts to zero or false.
+console.log(null == 0);          // false
+console.log(null == false);      // false
+console.log(undefined == 0);     // false
+console.log(undefined == false); // false
+
+Equality with Arrays and Objects
+This is where interview questions become more challenging.
+In JavaScript, arrays and objects are reference types. When you compare two separately created objects or arrays, 
+JavaScript checks whether they refer to the same object, not whether their contents look identical.
+
+Comparing arrays
+console.log([1, 2] == [1, 2]);  // false
+console.log([1, 2] === [1, 2]); // false
+
+Why are both results false?
+Each array literal creates a new array object. 
+The arrays have the same contents, but they are different objects in memory.
+
+Why are both results false?
+Each array literal creates a new array object. The arrays have the same contents, but they are different objects in memory.
+Think of it this way --
+
+Array A
+[1, 2]
+Reference A
+
+Array B
+[1, 2]
+Reference B
+
+Same contents, different references → false.
+
+Now consider:
+const a = [1, 2];
+const b = a;
+
+console.log(a == b);  // true
+console.log(a === b); // true
+
+**Comparing objects
+
+const obj1 = { name: "Sam" };
+const obj2 = { name: "Sam" };
+const obj3 = obj1;
+
+console.log(obj1 === obj2); // false
+console.log(obj1 === obj3); // true
+
+obj1 and obj2 are separately created objects.
+obj3 refers to the same object as obj1.
+
+Why does [] == false return true?
+console.log([] == false); // true
+
+What about [] == "" and [1] == 1?
+console.log([] == ""); // true
+console.log([1] == 1); // true
+
+Why?
+- [ ] converts to "".
+- [1] converts to "1", which can then convert to the number 1.
+
+Why is NaN === NaN false?
+console.log(NaN === NaN); // false
+console.log(NaN == NaN);  // false
+
+NaN means “Not-a-Number.” By JavaScript's equality rules,
+NaN is unequal to every value, including itself.
+
+**Type coercion: JavaScript converts values between types.
+**Implicit coercion: JavaScript performs the conversion automatically.
+**Explicit conversion: You deliberately use functions such as Number() or String().
+**==: Compares values with possible type coercion.
+**===: Compares without type coercion.
+**Object and array equality: Checks identity, not matching contents.
+**Truthy/falsy: Determines how a value behaves in a Boolean context; it is not the same as equality.
