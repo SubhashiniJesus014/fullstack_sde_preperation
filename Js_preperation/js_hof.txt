@@ -1,0 +1,67 @@
+What is a higher-order function?
+A higher-order function (HOF) is a function that does at least one of these two things:
+1. Takes another function as an argument.
+2. Returns another function as its result.
+If a function does either one, it qualifies as a higher-order function.
+
+Let's understand both cases separately.
+
+Case 1: Passing a function as an argument
+Consider this example:
+function greet(name) {
+    return "Hello, " + name;
+}
+
+function processUser(callback) {
+    console.log(callback("Subhashini"));
+}
+
+processUser(greet);
+
+Output:
+Hello, Subhashini
+
+How does it work?
+
+greet
+A function that returns a greeting
+Passed as an argument
+processUser(greet)
+Receives the function as callback
+callback("Subhashini")
+
+explaination ---
+- greet passes the function without executing it.
+- callback refers to that same function inside processUser.
+- callback("Subhashini") executes it.
+In this example, processUser is the higher-order function, and greet is the callback function.
+
+Case 2: Returning a function from another function
+This is connected to the closures you just learned.
+function multiplier(factor) {
+    return function(number) {
+        return number * factor;
+    };
+}
+
+const double = multiplier(2);
+
+console.log(double(5));
+console.log(double(10));
+
+Output:
+10
+20
+
+Step by step:
+1. multiplier(2) is called with factor = 2.
+2. It returns an inner function.
+3. double stores the returned function.
+4. double(5) calls the inner function with number = 5.
+5. The inner function uses the remembered factor = 2 and returns 10.
+Here, multiplier is a higher-order function because it returns another function. The inner function also forms a closure over factor.
+
+Remember the difference:
+- A higher-order function describes what a function does with other functions.
+- A closure describes how a function retains access to its lexical environment.
+A function can be both a higher-order function and create a closure, but they are different concepts.
