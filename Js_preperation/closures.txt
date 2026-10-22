@@ -1,0 +1,170 @@
+What is a closure in JavaScript?
+A closure is created when a function remembers and can access variables from its outer lexical scope, even after the outer function has finished executing.
+
+Let's break that definition into simple words:
+- A function is created inside another function.
+- The inner function uses variables from the outer function.
+- The outer function finishes executing.
+- The inner function can still access those variables later.
+That ability is called a closure.
+
+Understand closures with a simple example
+
+function outer() {
+    let count = 10;
+
+    function inner() {
+        console.log(count);
+    }
+
+    return inner;
+}
+
+const result = outer();
+
+result();
+
+Output:
+10
+
+You might wonder: How can inner() access count when outer() has already finished executing?
+
+Let's understand the execution step by step.
+
+--->Step 1: outer() executes
+A variable named count is created with the value 10. The inner function is also created.
+--->Step 2: return inner
+The function itself is returned, not the result of calling it. result now references the inner function.
+--->Step 3: result() executes later
+The inner function still has access to the lexical environment containing count, so it prints 10.
+
+Important interview point: JavaScript does not simply delete the outer function's local variables when the function returns. If an inner function still references that lexical environment, the necessary data can remain available.
+A closure retains access to its surrounding lexical environment; it does not necessarily copy or freeze the variable's value.
+
+
+---->Real-world example 1: A counter application
+Imagine you are building a social media application. Every time a user clicks the Like button, the like count should increase.
+We want the counter to remember its previous value between clicks.
+
+function createCounter() {
+    let count = 0;
+
+    return function() {
+        count++;
+        console.log(count);
+    };
+}
+
+const counter = createCounter();
+
+counter();
+counter();
+counter();
+Output:
+1
+2
+3
+How does closure help here?
+- createCounter() initializes count to 0.
+- It returns the inner function.
+- Every time counter() executes, it accesses and updates the same count variable.
+- The value remains available between calls because the returned function closes over that variable.
+
+Where is this useful in real applications?
+- Like and dislike counters.
+- Shopping cart item counts.
+- Tracking the number of button clicks.
+- Maintaining state inside a standalone JavaScript module.
+Note: In React applications, you would generally use React state for UI values such as likes, but the closure concept
+helps explain how functions retain access to surrounding variables.
+
+Real-world example 2: Data privacy and encapsulation
+Imagine you are building a banking application.
+A user has a bank balance. You want to allow deposits and withdrawals, but you don't want outside code to change the balance directly.
+Without proper encapsulation, you might write:
+
+let balance = 1000;
+balance = -5000;
+console.log(balance);
+
+Output:
+-5000
+
+Anyone with access to that variable can overwrite it.
+Using a closure
+
+function createBankAccount() {
+    let balance = 1000;
+
+    return {
+        deposit: function(amount) {
+            balance += amount;
+            console.log(balance);
+        },
+
+        getBalance: function() {
+            console.log(balance);
+        }
+    };
+}
+
+const account = createBankAccount();
+
+account.deposit(500);
+account.getBalance();
+
+console.log(account.balance);
+
+Output:
+1500
+1500
+undefined
+
+Why?
+- balance is a local variable inside createBankAccount().
+- The returned methods retain access to it through closures.
+- Outside code cannot directly access the local variable through account.balance.
+- The account's methods provide controlled access to the balance.
+
+--->Closures help implement private state and encapsulation in JavaScript.
+One important qualification: closures provide access control through scope, not complete security.
+A real banking application also needs server-side authorization, validation, and secure transaction handling.
+
+Real-world example 3: Event handlers and callbacks
+Suppose you want to display a welcome message when a user clicks a button. The message should remember the user's name.
+
+function greetUser(name) {
+    return function() {
+        console.log("Welcome " + name);
+    };
+}
+
+const greet = greetUser("Subhashini");
+greet();
+greet();
+
+Output:
+Welcome Subhashini
+Welcome Subhashini
+
+The returned function remembers "Subhashini" even though greetUser() has already returned.
+In a web application, the returned function can be registered as an event handler:
+function greetUser(name) {
+    return function() {
+        alert("Welcome " + name);
+    };
+}
+
+const greet = greetUser("Subhashini");
+
+document
+    .getElementById("welcomeButton")
+    .addEventListener("click", greet);
+
+Where is this useful?
+- Button click handlers.
+- Callbacks that need access to configuration.
+- Form validation messages.
+- Event listeners that need to retain contextual data.
+The key idea is that a callback does not have to receive all its data as arguments every time. 
+It can retain access to values from the scope where it was created.
