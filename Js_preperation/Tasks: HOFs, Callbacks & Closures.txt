@@ -1,0 +1,370 @@
+Task 1 — Custom Array Transformation
+Problem: Implement a function transformArray that takes an array and a callback function. Apply the callback to every element and return a new array.
+
+solution:
+function transformArray(arr,callback){
+  let res=[];
+  for(let i=0;i<arr.length;i++){
+    res.push(callback(arr[i]));
+  }
+  return res;
+}
+let arr=[1,2,3,4];
+let ans=transformArray([1, 2, 3, 4], x => x * 2);
+console.log(ans);
+
+Task 2 — Filter Employees by Salary
+Problem: Given an array of employees, implement filterEmployees that accepts a callback to determine which employees should be returned.
+
+solution:
+const employees = [
+    { name: "Asha", salary: 50000 },
+    { name: "Ravi", salary: 80000 },
+    { name: "Priya", salary: 65000 },
+    { name: "Kiran", salary: 40000 }
+];
+function filterEmployees(employees,callback){
+  let res=[];
+  for(let i=0;i<employees.length;i++){
+    if(callback(employees[i])){
+       res.push(employees[i]);
+    }
+  }
+  return res;
+}
+let ans=filterEmployees(employees, emp => emp.salary >= 60000);
+console.log(ans);
+
+Task 3 — Execute a Task Based on an Operation
+Problem: Implement calculate(a, b, operation), where operation is a callback.
+
+solution:
+function calculate(a,b,callback){
+ return callback(a,b);
+}
+
+calculate(10, 5, (a, b) => a + b); // 15
+calculate(10, 5, (a, b) => a - b); // 5
+calculate(10, 5, (a, b) => a * b); // 50
+let ans=calculate(10, 5, (a, b) => a / b); // 2
+console.log(ans);
+
+solution:
+// we can also improve the code in some more efficient way
+function calculate(a, b, operation) {
+    if (operation === divide && b === 0) {
+        throw new Error("Cannot divide by zero");
+    }
+
+    return operation(a, b);
+}
+
+function add(a, b) {
+    return a + b;
+}
+
+function sub(a, b) {
+    return a - b;
+}
+
+function mul(a, b) {
+    return a * b;
+}
+
+function divide(a, b) {
+    return a / b;
+}
+
+console.log(calculate(10, 5, add));    // 15
+console.log(calculate(10, 5, sub));    // 5
+console.log(calculate(10, 5, mul));   // 50
+console.log(calculate(10, 5, divide)); // 2
+
+console.log(calculate(10, 0, divide)); // Throws an error
+
+Task 4 — Run a Callback After a Delay
+Problem: Implement executeAfterDelay(callback, delay) to execute a callback after the specified number of milliseconds.
+
+solution:
+function executeAfterDelay(callback,delay){
+  setTimeout(callback,delay)
+}
+function hi(){
+  console.log("Hi");
+}
+function hello(){
+  console.log("hello");
+}
+executeAfterDelay(hi, 2000);
+executeAfterDelay(hello,3000);
+
+Task 5 — Process Orders Using Multiple Callbacks
+Problem: Create processOrders(orders, validator, discountCalculator).
+
+Each order has an amount and a status:
+
+solution:
+const orders = [
+    { id: 1, amount: 1000, status: "paid" },
+    { id: 2, amount: 500, status: "pending" },
+    { id: 3, amount: 2000, status: "paid" }
+];
+
+const validator = order => order.status === "paid";
+
+const discountCalculator = order => order.amount * 0.9;
+
+function processOrders(orders, validator, discountCalculator) {
+    let result = [];
+
+    for (let i = 0; i < orders.length; i++) {
+        if (validator(orders[i])) {
+            let discountedAmount = discountCalculator(orders[i]);
+
+            result.push({
+                ...orders[i],
+                finalAmount: discountedAmount
+            });
+        }
+    }
+
+    return result;
+}
+
+let ans = processOrders(orders, validator, discountCalculator);
+
+console.log(ans);
+
+Task 6 — Create a Counter
+Problem: Implement createCounter() that returns a function. Each call to the returned function increments and returns the counter.
+
+solution:
+
+function createCounter(){
+  let count=0;
+  function inner(){
+    count++;
+    return count;
+  }
+  return inner;
+}
+const counter = createCounter();
+
+console.log(counter()); // 1
+console.log(counter()); // 2
+console.log(counter()); // 3
+
+Task 7 — Bank Account With Private Balance
+Problem: Implement createBankAccount(initialBalance) that returns an object with three methods: deposit(amount), withdraw(amount), and getBalance().
+
+solution:
+function createBankAccount(balance){
+  function deposit(amount){
+    balance+=amount;
+  }
+  function withdraw(amount){
+    balance-=amount;
+  }
+  function getBalance(){
+    return balance;
+  }
+  return{
+    deposit,
+    withdraw,
+    getBalance
+  };
+}
+
+const account = createBankAccount(1000);
+
+account.deposit(500);
+console.log(account.getBalance()); // 1500
+
+account.withdraw(200);
+console.log(account.getBalance()); // 1300
+
+Task 8 — Generate Unique IDs
+Problem: Implement createIdGenerator(prefix) to generate sequential IDs using a private counter.
+
+
+function createIdGenerator(prefix){
+    let id=0;
+     function user(){
+       id++;
+       return prefix+id;
+     }
+    return user;
+}
+const userId = createIdGenerator("USER");
+const orderId = createIdGenerator("ORDER");
+
+console.log(userId());  // USER-1
+console.log(userId());  // USER-2
+console.log(orderId()); // ORDER-1
+console.log(userId());  // USER-3
+
+// if you keep id variable globally then same id variable is shared everytime it will not create the new one
+
+Task 9 — Create a Function That Remembers Its Previous Result
+Problem: Implement createRememberingFunction(fn) that remembers the most recent input and its result. If the next call uses the same input,
+return the cached result without calling fn again.
+
+// here for this task we need to know about the caching 
+
+What is caching in JavaScript?
+Caching is the technique of storing the result of an operation so that when the same operation is needed again, we can reuse the stored result instead of calculating or fetching it again.
+Think of it like this:
+Imagine you look up the capital of India. The first time, you search for it and learn that it is New Delhi. The next time someone asks you, you already know the answer, 
+so you don't need to search again.
+That is the basic idea of caching.
+
+--->Without caching vs. with caching
+--->Without caching
+Every request repeats the calculation or fetch.
+More repeated work
+
+---->With caching
+Reuse a previously stored result when possible.
+Less repeated work
+
+let calls=0;
+function square(n) {
+    calls++;
+    return n * n;
+}
+
+function  createRememberingFunction(fn) {
+  
+  let cache={};
+  return function(n){
+     if (Object.hasOwn(cache, n)) {
+            console.log("Getting result from cache");
+            return cache[n];
+        }
+  
+  console.log("Calculating...");
+        const result = fn(n);
+        cache[n] = result;
+        return result;
+  };
+}
+
+const rememberedSquare = createRememberingFunction(square);
+
+console.log(rememberedSquare(5)); // 25
+console.log(rememberedSquare(5)); // 25
+console.log(calls);               // 1
+
+console.log(rememberedSquare(6)); // 36
+console.log(calls);               // 2
+
+Task 10 — Create a Private Settings Manager
+Problem: Implement createSettings(initialSettings) with these methods:
+- get(key) — retrieve a setting.
+- set(key, value) — update a setting.
+- reset() — restore the original settings.
+
+solution:
+const settings = createSettings({
+    theme: "light",
+    language: "en"
+});
+
+settings.set("theme", "dark");
+console.log(settings.get("theme")); // "dark"
+
+settings.reset();
+console.log(settings.get("theme")); // "light"
+
+Task 11 — Implement Your Own map()
+Problem: Implement myMap(array, callback) without using the built-in map().
+
+solution:
+function myMap(arr,callback){
+  let res=[];
+  for(let i=0;i<arr.length;i++){
+    res.push(callback(arr[i]));
+  }
+  return res;
+}
+let ans=myMap([1, 2, 3], x => x * x);
+console.log(ans);
+
+Task 12 — Implement Your Own filter()
+Problem: Implement myFilter(array, callback) without using the built-in filter().
+
+solution:
+function myFilter(arr,callback){
+   let res=[];
+   for(let i=0;i<arr.length;i++){
+     if(callback(arr[i])){
+       res.push(arr[i]);
+     }
+   }
+  return res;
+}
+let ans=myFilter([10, 15, 20, 25, 30], n => n > 20);
+console.log(ans);
+// Expected: [25, 30]
+
+Task 13 — Implement once()
+Problem: Implement once(fn) so that the wrapped function executes only on its first call. Subsequent calls return the first result without executing fn again.
+
+function add(a, b) {
+    console.log("Function executed");
+    return a+b;
+}
+
+function once(fn) {
+    let executed=false;
+    let res;
+    return function(...args) {
+          if(executed===false){
+            res=fn(...args);
+            executed=true;
+          }
+          return res;
+    };
+}
+
+const onceAdd = once(add);
+
+console.log(onceAdd(2, 3));
+console.log(onceAdd(10, 20));
+console.log(onceAdd(5, 5));
+
+
+Task 14 — Implement Memoization
+Problem: Implement memoize(fn) to cache results for previously seen inputs.
+
+
+let calls = 0;
+
+function add(a, b) {
+    calls++;
+    return a + b;
+}
+
+function memoize(fn){
+    let cache={};
+  return function(...args){
+    const n=JSON.stringify(...args);
+     if (Object.hasOwn(cache, n)) {
+            console.log("Getting result from cache");
+            return cache[n];
+        }
+  
+  console.log("Calculating...");
+        const result = fn(...args);
+        cache[n] = result;
+        return result;
+  };
+}
+
+const memoizedAdd = memoize(add);
+
+console.log(memoizedAdd(2, 3)); // 5
+console.log(memoizedAdd(2, 3)); // 5
+console.log(memoizedAdd(4, 5)); // 9
+console.log(calls);             // 2
+
