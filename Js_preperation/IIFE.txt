@@ -1,0 +1,608 @@
+--->what is IIFE?
+IIFE stands for Immediately Invoked Function Expression.
+An IIFE is a function that is defined and executed immediately, without needing to call it separately later.
+It is a JavaScript concept worth understanding for interviews because it helps explain function expressions, scope, closures, and data privacy.
+
+HOW TO USE THESE NOTES
+----------------------
+1. Predict outputs before running the code.
+2. Explain WHY each output occurs.
+3. Practise writing the two coding tasks without looking at solutions.
+4. Remember: IIFE is usually tested together with scope, closures, hoisting, and asynchronous callbacks.
+
+1. WHAT IS AN IIFE?
+-------------------
+IIFE = Immediately Invoked Function Expression.
+
+An IIFE is a function expression that is executed immediately after it is defined.
+
+Example:
+(function () {
+    console.log("Hello");
+})();
+
+Output:
+Hello
+
+The first parentheses make the function an expression. The final () invokes it.
+
+Arrow-function IIFE:
+(() => {
+    console.log("Executed immediately");
+})();
+
+2. NORMAL FUNCTION VS IIFE
+--------------------------
+Normal function:
+function greet() {
+    console.log("Hello");
+}
+greet(); // called separately
+
+IIFE:
+(function greet() {
+    console.log("Hello");
+})(); // executes immediately
+
+3. COMMON IIFE FORMS
+--------------------
+Anonymous IIFE:
+(function () {
+    console.log("Anonymous");
+})();
+
+Named IIFE:
+(function greet() {
+    console.log("Named");
+})();
+
+Arrow IIFE:
+(() => {
+    console.log("Arrow IIFE");
+})();
+
+IIFE with parameters:
+(function (a, b) {
+    console.log(a + b);
+})(10, 20);
+// Output: 30
+
+IIFE returning a value:
+const result = (function () {
+    return 50 + 25;
+})();
+console.log(result); // 75
+
+4. WHY USE AN IIFE?
+-------------------
+Historically, IIFEs were used to:
+- Create a private function scope.
+- Keep temporary variables out of the surrounding/global scope.
+- Avoid naming conflicts.
+- Initialize code immediately.
+- Create private state with closures.
+
+Modern JavaScript also offers let, const, block scope, and ES modules, so IIFEs are not required for every use case.
+
+5. SCOPE: LOCAL VS OUTER VARIABLE
+---------------------------------
+var x = 10;
+
+(function () {
+    var x = 30;
+    console.log(x);
+})();
+
+console.log(x);
+
+Output:
+30
+10
+
+The inner x is local to the IIFE. It does not replace the outer x.
+
+6. IIFE, CLOSURES, AND PRIVATE COUNTER
+--------------------------------------
+const counter = (function () {
+    let count = 0;
+
+    return {
+        increment: function () {
+            count++;
+            return count;
+        },
+        decrement: function () {
+            count--;
+            return count;
+        },
+        getCount: function () {
+            return count;
+        }
+    };
+})();
+
+console.log(counter.increment()); // 1
+console.log(counter.increment()); // 2
+console.log(counter.decrement()); // 1
+console.log(counter.getCount());  // 1
+
+How it works:
+- The IIFE executes once and returns an object.
+- count is private: outside code cannot access it directly.
+- Returned methods retain access to count through closures.
+- return sends a value to the caller; console.log only prints a value.
+- Without an explicit return, a JavaScript function returns undefined.
+
+7. IIFE + var + setTimeout (CLASSIC INTERVIEW QUESTION)
+-------------------------------------------------------
+for (var i = 1; i <= 3; i++) {
+    setTimeout(function () {
+        console.log(i);
+    }, 100);
+}
+
+Output:
+4
+4
+4
+
+Why:
+- var is function-scoped, not block-scoped.
+- All three callbacks refer to the same i.
+- The loop finishes first; i becomes 4.
+- Then callbacks run and read that shared variable.
+
+Fix with IIFE:
+for (var i = 1; i <= 3; i++) {
+    (function (num) {
+        setTimeout(function () {
+            console.log(num);
+        }, 100);
+    })(i);
+}
+
+Output:
+1
+2
+3
+
+Why:
+- Each IIFE invocation receives the current i as num.
+- Each invocation has its own parameter binding.
+- The callback closes over that invocation's num.
+
+8. let + setTimeout
+-------------------
+for (let i = 1; i <= 3; i++) {
+    setTimeout(function () {
+        console.log(i);
+    }, 100);
+}
+
+Output:
+1
+2
+3
+
+In this kind of for loop, let creates a separate iteration binding for i. Each callback closes over the appropriate binding. An IIFE is unnecessary.
+
+Comparison:
+- var without IIFE: 4, 4, 4
+- var with IIFE:    1, 2, 3
+- let without IIFE: 1, 2, 3
+- let with IIFE:    1, 2, 3 (works, but usually redundant)
+
+Important: setTimeout does not save the value by itself. The closure and the variable bindings determine what the callback reads.
+
+9. IMPORTANT DIFFERENCE: console.log VS return
+-----------------------------------------------
+function increment() {
+    let count = 0;
+    count++;
+    console.log(count);
+}
+
+console.log(increment());
+
+Output:
+1
+undefined
+
+The function prints 1 internally, but has no return statement. Therefore, the outer console.log prints undefined.
+
+Correct if the caller needs the value:
+function increment() {
+    let count = 0;
+    count++;
+    return count;
+}
+console.log(increment()); // 1
+
+10. INTERVIEW QUESTIONS (CONCEPTUAL)
+------------------------------------
+Q1. What does IIFE stand for?
+Answer: Immediately Invoked Function Expression; it executes immediately after being defined.
+
+Q2. Why are parentheses used around an IIFE?
+Answer: They make the function a function expression so it can be invoked immediately.
+
+Q3. What are common uses of IIFE?
+Answer: Isolated function scope, avoiding naming conflicts, immediate initialization, and private state with closures.
+
+Q4. Can an IIFE accept parameters and return a value?
+Answer: Yes, like any other function.
+
+Q5. What is a closure?
+Answer: A function together with access to variables from its surrounding lexical scope, even after the outer function has finished.
+
+Q6. How does an IIFE help create private data?
+Answer: Variables declared inside it are not directly accessible outside, but returned methods can access them through closures.
+
+Q7. Does the IIFE in the counter example run every time counter.increment() is called?
+Answer: No. The IIFE runs once when the expression is evaluated. The returned method is called repeatedly.
+
+Q8. Why does var print 4, 4, 4 in a setTimeout loop?
+Answer: All callbacks share the same var binding, and the loop finishes with i equal to 4 before callbacks execute.
+
+Q9. How does IIFE fix the var loop?
+Answer: It receives the current i as a parameter, creating a separate parameter binding for each invocation.
+
+Q10. Why does let print 1, 2, 3 without an IIFE?
+Answer: A for loop using let creates a separate binding for each iteration.
+
+Q11. Is IIFE still necessary in modern JavaScript?
+Answer: Not always. let, const, and ES modules cover many use cases, but IIFEs remain useful for immediate execution and isolated state.
+
+Q12. What is the difference between console.log and return?
+Answer: console.log displays a value; return passes a value back to the caller and ends that function invocation.
+
+Q13. What is a named IIFE?
+Answer: An IIFE with a name, such as (function greet() {})(). Its name is generally available only inside that function expression, not as an outer variable.
+
+Q14. Can arrow functions be used as IIFEs?
+Answer: Yes: (() => { console.log("Hi"); })();
+
+Q15. Does var create a new variable for each loop iteration?
+Answer: No. In a typical for loop, var uses one shared binding. let creates per-iteration bindings in this loop form.
+
+11. OUTPUT-PREDICTION TASKS
+---------------------------
+
+TASK 1 — Basic IIFE
+(function () {
+    console.log("Hello");
+})();
+Predict the output: __________________________
+
+TASK 2 — Parameters
+(function (a, b) {
+    console.log(a * b);
+})(4, 5);
+Predict the output: __________________________
+
+TASK 3 — Return value
+let result = (function () {
+    return 50 + 25;
+})();
+console.log(result);
+Predict the output: __________________________
+
+TASK 4 — Local vs outer variable
+var x = 10;
+(function () {
+    var x = 30;
+    console.log(x);
+})();
+console.log(x);
+Predict both outputs: ________________________
+
+TASK 5 — let shadowing
+let value = 100;
+(function () {
+    let value = 200;
+    console.log(value);
+})();
+console.log(value);
+Predict both outputs: ________________________
+
+TASK 6 — Private variable
+(function () {
+    let secret = "JavaScript";
+})();
+console.log(secret);
+Does it print a value or throw an error? Why?
+Answer: _____________________________________
+
+TASK 7 — var loop with IIFE
+for (var i = 1; i <= 3; i++) {
+    (function (num) {
+        setTimeout(function () {
+            console.log(num);
+        }, 100);
+    })(i);
+}
+Predict the output: __________________________
+
+TASK 8 — Counter closure
+const counter = (function () {
+    let count = 0;
+    return function () {
+        count++;
+        return count;
+    };
+})();
+console.log(counter());
+console.log(counter());
+console.log(counter());
+Predict the output: __________________________
+
+TASK 9 — Multiple calls
+const counter = (function () {
+    let count = 10;
+    return function () {
+        return ++count;
+    };
+})();
+const a = counter();
+const b = counter();
+console.log(a);
+console.log(b);
+Predict the output: __________________________
+Does the IIFE execute again for each counter() call?
+Answer: _____________________________________
+
+TASK 10 — Private state object
+const user = (function () {
+    let name = "Alex";
+    return {
+        getName: function () { return name; },
+        setName: function (newName) { name = newName; }
+    };
+})();
+console.log(user.getName());
+user.setName("Sam");
+console.log(user.getName());
+console.log(user.name);
+Predict all outputs: _________________________
+
+TASK 11 — Scope and update
+let x = 5;
+(function () {
+    let x = 10;
+    x += 5;
+    console.log(x);
+})();
+console.log(x);
+Predict both outputs: ________________________
+
+TASK 12 — Named IIFE
+(function greet() {
+    console.log("Inside");
+})();
+console.log(typeof greet);
+Predict the output. Does the second line print "function" or "undefined"?
+Answer: _____________________________________
+
+TASK 13 — var hoisting
+(function () {
+    console.log(typeof message);
+    var message = "Hello";
+    console.log(typeof message);
+})();
+Predict both outputs: ________________________
+
+TASK 14 — Arrow IIFE
+const answer = (() => {
+    return 10 * 2;
+})();
+console.log(answer);
+Predict the output: __________________________
+
+TASK 17 — IIFE and return
+(function () {
+    console.log("A");
+    return;
+    console.log("B");
+})();
+What prints? _________________________________
+
+TASK 18 — Nested function and closure
+const getValue = (function () {
+    let value = 7;
+    return function () {
+        return value;
+    };
+})();
+console.log(getValue());
+Predict the output and explain why.
+Answer: _____________________________________
+
+12. CODING TASKS
+----------------
+
+TASK 15 — Build a private counter (Easy)
+Use an IIFE to create an object with:
+- increment(): increase the counter and return the new value.
+- decrement(): decrease the counter and return the new value.
+- getCount(): return the current value.
+- Keep the count variable private.
+
+Expected usage:
+console.log(counter.increment()); // 1
+console.log(counter.increment()); // 2
+console.log(counter.decrement()); // 1
+console.log(counter.getCount());  // 1
+
+Write your solution:
+________________________________________________
+________________________________________________
+________________________________________________
+________________________________________________
+
+TASK 16 — Create a multiplier (Medium)
+Use an IIFE to keep a factor of 3 private and return a function that multiplies its argument by 3.
+
+Expected usage:
+console.log(multiply(5));  // 15
+console.log(multiply(10)); // 30
+
+Write your solution:
+________________________________________________
+________________________________________________
+________________________________________________
+________________________________________________
+
+TASK 19 — Fix the loop
+The following prints 4 three times. Fix it using an IIFE, without changing var to let.
+
+for (var i = 1; i <= 3; i++) {
+    setTimeout(function () {
+        console.log(i);
+    }, 100);
+}
+
+Write your solution:
+________________________________________________
+________________________________________________
+________________________________________________
+________________________________________________
+
+TASK 20 — Explain the difference
+Explain why these two snippets produce different output.
+
+A:
+for (var i = 1; i <= 3; i++) {
+    setTimeout(() => console.log(i), 100);
+}
+
+B:
+for (let i = 1; i <= 3; i++) {
+    setTimeout(() => console.log(i), 100);
+}
+
+Your explanation:
+________________________________________________
+________________________________________________
+________________________________________________
+
+13. ANSWER KEY FOR OUTPUT TASKS
+-------------------------------
+Task 1: Hello
+
+Task 2: 20
+
+Task 3: 75
+
+Task 4:
+30
+10
+
+Task 5:
+200
+100
+
+Task 6: ReferenceError, because secret is scoped inside the IIFE and is not defined in the outer scope. (The error occurs when evaluating console.log(secret).)
+
+Task 7: 1, 2, 3 (after the scheduled delay; normally in this order)
+
+Task 8:
+1
+2
+3
+
+Task 9:
+11
+12
+No. The IIFE executes once; the returned function is called repeatedly and shares the retained count.
+
+Task 10:
+Alex
+Sam
+undefined
+The name property is not part of the returned object. The private name variable is accessible through the returned methods.
+
+Task 11:
+15
+5
+
+Task 12:
+Inside
+undefined
+The name greet is scoped to the named function expression and is not defined as an outer variable.
+
+Task 13:
+undefined
+string
+var declarations are hoisted and initialized to undefined; the assignment occurs later.
+
+Task 14: 20
+
+Task 17: A. The return exits the function before console.log("B").
+
+Task 18: 7. The returned function closes over the value variable created by the IIFE.
+
+14. SAMPLE SOLUTIONS FOR CODING TASKS
+-------------------------------------
+
+TASK 15 — Private counter
+const counter = (function () {
+    let count = 0;
+
+    return {
+        increment: function () {
+            count++;
+            return count;
+        },
+        decrement: function () {
+            count--;
+            return count;
+        },
+        getCount: function () {
+            return count;
+        }
+    };
+})();
+
+TASK 16 — Multiplier
+const multiply = (function () {
+    const factor = 3;
+
+    return function (number) {
+        return number * factor;
+    };
+})();
+
+TASK 19 — Fix var loop with IIFE
+for (var i = 1; i <= 3; i++) {
+    (function (num) {
+        setTimeout(function () {
+            console.log(num);
+        }, 100);
+    })(i);
+}
+
+TASK 20 — Explanation
+A prints 4, 4, 4 because every callback refers to the same var binding, which is 4 when callbacks execute.
+B prints 1, 2, 3 because let creates a distinct iteration binding for each loop iteration.
+
+15. QUICK REVISION
+------------------
+- IIFE = Immediately Invoked Function Expression.
+- Standard syntax: (function () { ... })();
+- Arrow syntax: (() => { ... })();
+- IIFE executes immediately; a returned function can be called later.
+- IIFE creates function scope.
+- Closure lets an inner function retain access to outer lexical variables.
+- var is function-scoped; in the classic loop, callbacks share one i.
+- let is block-scoped and creates per-iteration bindings in a for loop.
+- console.log prints; return sends a value back to the caller.
+- IIFE + var can preserve loop values by passing the current value as a parameter.
+- For modern code, let often removes the need for the loop IIFE.
+
+Interview strategy:
+For every output question, explain:
+1. Which scope each variable belongs to.
+2. Whether the callback executes now or later.
+3. Which binding the callback closes over.
+4. Whether the function returns a value or only prints one.
+
