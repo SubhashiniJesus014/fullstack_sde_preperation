@@ -1,0 +1,328 @@
+JavaScript call(), apply(), and bind()
+
+Since you're preparing for product-based companies, you should understand these methods from three angles:
+1. Concept: Why do we use them?
+2. Coding: How do they work with this?
+3. Interviews: What output-based questions and coding tasks should you practice?
+All three methods belong to JavaScript functions and help us control the value of this when a function executes.
+
+1. First, understand the problem
+Suppose we have an object and a function.
+
+const user = {
+    name: "Subbu"
+};
+function greet() {
+    console.log("Hello " + this.name);
+}
+greet();
+
+What happens here?
+The function is called normally, so in a browser's non-strict mode, this refers to the global object. In strict mode, this is undefined. Either way, it doesn't automatically refer to the user object.
+But what if we want to execute greet() using the user object's data?
+That's where call(), apply(), and bind() help.
+
+2. The difference at a glance
+Method	                              What it does	                                                          When does the function execute?
+call()	    Calls a function with a chosen this and individual arguments	                                    Immediately
+apply()	    Calls a function with a chosen this and arguments in an array-like collection	                    Immediately
+bind()	    Creates a new function with a chosen this and optionally preset arguments	                        Later,when you call the new function
+
+Remember this simple rule:
+- Call: Execute now, arguments separately.
+- Apply: Execute now, arguments as an array.
+- Bind: Create a function to execute later.
+
+3. call() method
+Syntax:
+functionName.call(thisValue, arg1, arg2, ...);
+
+Example:
+const user = {
+    name: "Subbu"
+};
+
+function greet(city, country) {
+    console.log("Hello " + this.name);
+    console.log(city, country);
+}
+
+greet.call(user, "Bangalore", "India");
+
+Output:
+Hello Subbu
+Bangalore India
+
+How does it work?
+Step 1: greet.call()
+JavaScript receives the function call.
+|
+this = user
+The function uses the supplied object as this.
+|
+this.name → "Subbu"
+|
+The function executes immediately.
+
+--->The important point is that greet() is not permanently attached to the user object. We are simply choosing the this value for this particular call.
+
+Another example: Reusing a function
+const person1 = {
+    name: "Ravi"
+};
+
+const person2 = {
+    name: "Priya"
+};
+
+function introduce(age) {
+    console.log(this.name + " is " + age + " years old");
+}
+
+introduce.call(person1, 25);
+introduce.call(person2, 22);
+
+Output:
+Ravi is 25 years old
+Priya is 22 years old
+
+Interview takeaway: The same function can work with different objects without duplicating its code.
+
+4. apply() method
+apply() works almost exactly like call(). The main difference is how we pass arguments.
+
+Syntax:
+functionName.apply(thisValue, [arg1, arg2, ...]);
+
+Example:
+const user = {
+    name: "Subbu"
+};
+
+function greet(city, country) {
+    console.log(this.name, city, country);
+}
+greet.apply(user, ["Bangalore", "India"]);
+
+Output:
+Subbu Bangalore India
+
+Compare the two:
+greet.call(user, "Bangalore", "India");
+greet.apply(user, ["Bangalore", "India"]);
+
+Both execute immediately and use user as this.
+Practical example: Finding the maximum number
+example---
+const numbers = [10, 50, 20, 90, 30];
+console.log(Math.max.apply(null, numbers));
+
+Output:
+90
+
+Here, apply() passes the array elements as individual arguments to Math.max().
+Modern JavaScript usually uses the spread operator for this:
+
+console.log(Math.max(...numbers));
+
+5. bind() method
+bind() is different because it does not execute the function immediately. It returns a new function with a preset this value.
+Syntax:
+const newFunction = functionName.bind(thisValue, arg1, arg2, ...);
+
+Example:
+const user = {
+    name: "Subbu"
+};
+
+function greet(city) {
+    console.log("Hello " + this.name + " from " + city);
+}
+const newGreet = greet.bind(user, "Bangalore");
+newGreet();
+
+Output:
+Hello Subbu from Bangalore
+
+Understand it step by step
+Step 1: Create a new function
+|
+const newGreet = greet.bind(user, "Bangalore");
+No greeting is printed yet.
+|
+Step 2: Call the new function
+newGreet();
+|
+Step 3: Get the output
+Hello Subbu from Bangalore
+
+Why is bind() useful?
+Consider this example:
+
+const user = {
+    name: "Subbu",
+
+    greet: function () {
+        console.log(this.name);
+    }
+};
+
+const greetLater = user.greet;
+greetLater();
+
+Here, the method is extracted from the object. When greetLater() is called as a standalone function, it no longer gets user as its this value. In strict mode, this will be undefined.
+
+Fix it using bind():
+const greetLater = user.greet.bind(user);
+greetLater();
+
+Output:
+Subbu
+This is useful when passing object methods as callbacks, including event handlers and asynchronous code.
+
+6. One example comparing all three
+Study this example carefully because it is a common interview question.
+const person = {
+    name: "Ravi"
+};
+function details(city, role) {
+    console.log(this.name, city, role);
+}
+details.call(person, "Bangalore", "Developer");
+details.apply(person, ["Hyderabad", "Tester"]);
+const result = details.bind(person, "Chennai", "Engineer");
+result();
+
+Output:
+Ravi Bangalore Developer
+Ravi Hyderabad Tester
+Ravi Chennai Engineer
+
+Notice that bind() stores the function in result, and only result() executes it.
+7. Important interview concepts
+A. Can we use call(), apply(), and bind() with arrow functions?
+Arrow functions do not have their own this. They inherit it from the surrounding lexical scope.
+
+const user = {
+    name: "Ravi"
+};
+const greet = () => {
+    console.log(this.name);
+};
+greet.call(user);
+
+call() cannot change the arrow function's this. The output depends on the surrounding scope; in a typical browser script it may be an empty string or undefined, depending on the environment.
+Interview answer: These methods can invoke or wrap arrow functions, but they cannot override an arrow function's lexical this.
+
+B. Can bind() be called multiple times?
+const person1 = { name: "Ravi" };
+const person2 = { name: "Priya" };
+
+function greet() {
+    console.log(this.name);
+}
+
+const first = greet.bind(person1);
+const second = first.bind(person2);
+second();
+
+Output:
+Ravi
+
+The first binding determines this for an ordinary bound function. A subsequent bind() does not replace it.
+C. Can we preset arguments with bind()?
+Yes. This is called partial application.
+
+function add(a, b) {
+    return a + b;
+}
+const add10 = add.bind(null, 10);
+console.log(add10(5));
+console.log(add10(20));
+Output:
+15
+30
+
+The first argument is preset to 10. The remaining argument is provided when calling add10().
+D. Does bind() always preserve this?
+For an ordinary function, a bound this cannot be replaced by a later .call() or .apply().
+
+const user1 = { name: "Ravi" };
+const user2 = { name: "Priya" };
+
+function greet() {
+    console.log(this.name);
+}
+
+const bound = greet.bind(user1);
+bound.call(user2);
+
+Output:
+Ravi
+
+This is because bound already has its this value fixed to user1.
+One advanced exception: when a bound constructor is invoked with new, the newly created instance becomes this, rather than the bound object.
+
+----> my own implementation of mycall
+
+const user={
+  name:"subbu"
+}
+function greet(greeting){
+  return greeting+" "+this.name;
+}
+console.log(greet.call(user,"good morning"));
+Function.prototype.mycall=function(obj={},...args){
+  console.log(this);
+  obj.fn=this;
+  return obj.fn(...args);
+};
+console.log(greet.mycall(user,"good morning"));
+
+-----> my own implementation of myapply
+
+const user={
+  name:"subbu"
+}
+function greet(greeting){
+  return greeting+" "+this.name;
+}
+console.log(greet.apply(user,["good morning"]));
+Function.prototype.myapply=function(obj={},...args){
+  console.log(this);
+  if(!Array.isArray(...args)){
+    return typeError("parameters are not in array")
+  }
+  obj.fn=this;
+  return obj.fn(...args);
+};
+console.log(greet.myapply(user,["good morning"]));
+
+----> my own implementation of mybind
+const user={
+  name:"subbu"
+}
+function greet(greeting,hello){
+  return greeting+" "+this.name+" "+hello;
+}
+const greetings=greet.bind(user,"good morning");
+console.log(greetings("hello"));
+
+
+Function.prototype.mybind=function(obj={},...args1){
+  console.log(this);
+  obj.fn=this;
+  return function(...args2){
+  return obj.fn(...args1,...args2);}
+};
+
+Function.prototype.mybind = function(obj, ...args1) {
+    const originalFunction = this;
+     console.log(this);
+    return function(...args2) {
+        return originalFunction.apply(obj, [...args1, ...args2]);
+    };
+};
+const bindgreet=greet.mybind(user,"good morning");
+console.log(bindgreet("hello"));
+---> in the above code there are 2 own implementations you can use it based on your choice
