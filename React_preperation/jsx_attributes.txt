@@ -1,0 +1,93 @@
+1. What is JSX vs HTML attributes?
+JSX (JavaScript XML) lets us write HTML-like syntax inside JavaScript when building React components.
+However, JSX uses some different attribute names from HTML because JSX follows JavaScript naming conventions and React's rules.
+
+For example:
+HTML	         JSX	                    Purpose
+class	        className	           Apply CSS classes
+for	          htmlFor	             Connect a label to an input
+onclick	      onClick	             Handle a click event
+tabindex	    tabIndex	           Set keyboard navigation order
+readonly	    readOnly	           Make a field read-only
+maxlength	    maxLength	           Limit the number of characters
+
+In React JSX, we use className
+function Product() {
+  return (
+    <div className="product-card">
+      <h2>Laptop</h2>
+      <p>Price: ₹50,000</p>
+    </div>
+  );
+}
+
+export default Product;
+
+In React JSX, use htmlFor.
+
+React JSX:
+function LoginForm() {
+  return (
+    <div>
+      <label htmlFor="email">Email:</label>
+      <input type="email" id="email" />
+    </div>
+  );
+}
+
+export default LoginForm;
+
+How does it work?
+1. The label has htmlFor="email".
+2. The input has id="email".
+3. Both values match, so clicking the label focuses the email input.
+Real-world example: In a login page, labels help users understand where to enter their email address and password. Correctly associated labels also improve accessibility.
+
+4. Example 3: onclick vs onClick
+HTML uses lowercase onclick, whereas JSX uses camelCase onClick.
+
+React example:
+function AddToCart() {
+  function handleClick() {
+    alert("Product added to cart!");
+  }
+
+  return (
+    <button onClick={handleClick}>
+      Add to Cart
+    </button>
+  );
+}
+
+export default AddToCart;
+
+5.Example 4: HTML attributes vs JSX expressions
+JSX also lets us use JavaScript expressions inside curly braces {}.
+
+function Product() {
+  const productName = "Laptop";
+  const price = 50000;
+  const isAvailable = true;
+
+  return (
+    <div className="product-card">
+      <h2>{productName}</h2>
+      <p>Price: ₹{price}</p>
+
+      <button disabled={!isAvailable}>
+        Add to Cart
+      </button>
+    </div>
+  );
+}
+
+export default Product;
+
+Here:
+- className="product-card" passes a string.
+- {productName} displays a JavaScript variable.
+- {price} displays the numeric price.
+- disabled={!isAvailable} uses a JavaScript expression to determine whether the button is disabled.
+This is useful in real applications because product information and button states often come from API responses.
+
+
