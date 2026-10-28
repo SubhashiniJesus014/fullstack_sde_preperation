@@ -1,0 +1,265 @@
+# React Rendering Priorities: Why React Can Split and Prioritize Work
+
+For product-based company interviews, this topic is mainly about understanding why React should keep the user interface responsive even when an application has a lot of work to do.
+
+You don't need to memorize React's internal implementation. You need to understand the problem, the solution, and when it matters in a real application.
+
+## 1. First, understand the problem React is trying to solve
+
+Imagine you're building an e-commerce website using React.
+
+A user is searching for a laptop and types this into the search box:
+
+`MacBook Pro`
+
+As the user types, your application needs to:
+
+- Update the text in the input immediately.
+- Filter hundreds or thousands of products.
+- Update the product list.
+- Possibly calculate prices, ratings, and availability.
+
+Suppose filtering the products takes a noticeable amount of time.
+
+If the browser spends too long processing rendering work, the user may experience:
+
+- Delayed typing.
+- A frozen or unresponsive interface.
+- Laggy interactions.
+- A poor user experience.
+
+React has features that help manage rendering work so that urgent interactions can remain responsive while less urgent UI updates are processed appropriately.
+
+## 2. What does it mean to split rendering work?
+
+Splitting work means breaking up rendering work so React can yield control instead of having to complete all the work in one uninterrupted stretch.
+
+Consider two approaches.
+
+## Approach A: A long, uninterrupted task
+
+User types a character
+
+Long rendering task
+
+The browser may not be able to respond promptly to other work until the main-thread task yields.
+
+## Approach B: Work that can yield
+
+Rendering work
+
+Yield so other work can run
+
+Continue rendering if needed
+
+React can schedule and interrupt certain rendering work, then resume or restart it as appropriate.
+
+One important detail: React's concurrent rendering capabilities allow React to pause, resume, or abandon certain rendering work. React does not arbitrarily interrupt every JavaScript operation. Individual JavaScript functions still run to completion unless they explicitly yield.
+
+Also, splitting React rendering work doesn't automatically make expensive calculations faster. Sometimes you must optimize the calculation itself or move suitable work to a Web Worker.
+
+## 3. What does prioritizing rendering mean?
+
+Prioritizing means treating some UI updates as more urgent than others.
+
+For our laptop search page, compare these two updates:
+
+| Update                                    | Priority           | Why?                                              |
+| ----------------------------------------- | ------------------ | ------------------------------------------------- |
+| Update the search input as the user types | Urgent             | The user expects immediate feedback               |
+| Update a large filtered product list      | Can be less urgent | It can lag slightly behind the input if necessary |
+
+The user should be able to type smoothly even if the product results take a little longer to catch up.
+
+This is the main idea behind React's rendering priorities: not all UI updates need to be processed with equal urgency.
+
+Notice that this is about rendering work, not about making an HTTP request itself higher or lower priority. React scheduling doesn't automatically prioritize network requests or make CPU-intensive calculations run faster.
+
+## 4. Real-world React example
+
+Imagine a search page with 10,000 products. Here is a simplified example of how you might write it:
+
+```
+import { useState } from "react";
+
+function ProductSearch({ products }) {
+  const [search, setSearch] = useState("");
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div>
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search laptops..."
+      />
+
+      <ul>
+        {filteredProducts.map((product) => (
+          <li key={product.id}>{product.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+This is simple code, but when the list is large and rendering is expensive, the input and results can compete for the browser's main-thread time.
+
+React's concurrent features can help make this experience more responsive.
+
+### A. `useTransition`
+
+`useTransition` lets you mark certain state updates as non-urgent transitions.
+
+For example:
+
+```
+import { useState, useTransition } from "react";
+
+function ProductSearch({ products }) {
+  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
+  const [isPending, startTransition] = useTransition();
+
+  function handleChange(e) {
+    const value = e.target.value;
+
+    setSearch(value); // Urgent update
+
+    startTransition(() => {
+      setQuery(value); // Non-urgent update
+    });
+  }
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <div>
+      <input
+        value={search}
+        onChange={handleChange}
+        placeholder="Search laptops..."
+      />
+
+      {isPending && <p>Updating results...</p>}
+
+      <ul>
+        {filteredProducts.map((product) => (
+          <li key={product.id}>{product.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+How does it help?
+
+1. `setSearch(value)` updates the controlled input urgently.
+2. `startTransition()` marks the query update as non-urgent.
+3. React can prioritize urgent interactions over the transition's rendering work.
+4. `isPending` lets you show that the transition is still in progress.
+
+The product results may temporarily reflect an earlier query while the next update is pending.
+
+A practical note: this example illustrates scheduling, not a guaranteed performance improvement. The filtering calculation itself still runs synchronously during rendering. For very large datasets, consider memoization, debouncing where appropriate, virtualization, or a more efficient search strategy as well.
+
+### B. `useDeferredValue`
+
+Another useful hook is `useDeferredValue`.
+
+Use it when you want the input to update immediately but allow a dependent part of the UI to lag behind.
+
+```
+import { useState, useDeferredValue } from "react";
+
+function ProductSearch({ products }) {
+  const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
+
+  const filteredProducts = products.filter((product) =>
+    product.name
+      .toLowerCase()
+      .includes(deferredSearch.toLowerCase())
+  );
+
+  return (
+    <div>
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search laptops..."
+      />
+
+      <ul>
+        {filteredProducts.map((product) => (
+          <li key={product.id}>{product.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+Here is the difference:
+
+- `search` represents the current input value.
+- `deferredSearch` is the value React can allow to lag behind while more urgent updates are handled.
+- The results use `deferredSearch`, so React can prioritize the input over rendering the dependent results.
+
+`useDeferredValue` does not debounce input, delay a network request by a fixed amount, or make filtering itself faster. It helps prioritize rendering when the deferred part of the UI is expensive enough to benefit from it.
+
+## 5. `useTransition` vs `useDeferredValue`
+
+Both are useful, but they solve slightly different problems.
+
+| `useTransition`                                 | `useDeferredValue`                                   |
+| ----------------------------------------------- | ---------------------------------------------------- |
+| Marks a state update as a transition            | Defers updating a value used by part of the UI       |
+| You control which state update is non-urgent    | You provide a value whose newer version can lag      |
+| Provides `isPending` to track the transition    | Does not directly provide an `isPending` flag        |
+| Useful for navigation or expensive view changes | Useful for expensive results that depend on an input |
+
+For example, a tab switch that displays a complex report could use `useTransition`. A search field whose results are expensive to render could use `useDeferredValue`.
+
+Neither hook automatically speeds up an expensive calculation or a slow API.
+
+## 6. Why does React need this? What if we don't use it?
+
+Imagine you work at a product company building a flight-booking website.
+
+A user selects a destination and date. Your application must update the date input, calculate available flights, and render a large list of flight cards.
+
+Without prioritization, expensive rendering can make the UI feel laggy if the browser's main thread is busy.
+
+With React's concurrent features, you can mark the expensive view update as non-urgent so the user can continue interacting with the page more smoothly.
+
+However, not every performance problem is solved by concurrent rendering. If the page is slow because of a large JavaScript bundle, inefficient algorithms, excessive DOM elements, or a slow API, you must address those problems too.
+
+## 7. What you should know for interviews — without memorizing implementation details
+
+Focus on these five points:
+
+- Rendering can be interrupted: React can yield during eligible rendering work rather than always completing a render in one uninterrupted pass.
+- Priority matters: Updates tied to immediate user interactions should generally remain responsive.
+- Transitions mark non-urgent work: `useTransition` and `startTransition` let you mark certain state updates as non-urgent.
+- Deferred values help dependent UI: `useDeferredValue` lets an expensive part of the UI lag behind a more urgent value.
+- Rendering is not the same as committing: React can abandon an unfinished render without applying it to the DOM. Necessary DOM changes are applied during the commit phase.
+
+You do not need to memorize React's internal scheduler algorithms, lane numbers, or implementation-specific data structures for a typical frontend interview unless the role specifically requires React internals expertise.
+
+## 8. Interview-ready answer
+
+If the interviewer asks, "Why can React split and prioritize rendering work?", you can say:
+
+> "React supports concurrent rendering so that expensive UI updates don't always have to block more urgent interactions. For example, in an e-commerce application, updating a search input should feel immediate, even when rendering a large product list takes longer.
+>
+> React can yield during eligible rendering work and prioritize more urgent updates. I can use `useTransition` to mark a state update as non-urgent, or `useDeferredValue` to allow a dependent part of the UI to lag behind an input value.
+>
+> This improves responsiveness, but it doesn't automatically make expensive calculations or API requests faster. I would also consider optimizing the calculation, reducing unnecessary renders, and virtualizing large lists where appropriate."
