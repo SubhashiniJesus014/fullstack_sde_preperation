@@ -1,0 +1,515 @@
+JSX RULES AND EXPRESSIONS IN REACT.JS
+======================================
+
+Since you're preparing for product-based company interviews, let's understand JSX rules and expressions with simple examples, real-world use cases, and interview-ready answers.
+
+1. WHAT IS JSX?
+---------------
+
+JSX stands for JavaScript XML. It allows us to write HTML-like syntax inside JavaScript when building React components.
+
+Without JSX:
+
+const element = React.createElement(
+  "h1",
+  null,
+  "Hello World"
+);
+
+With JSX:
+
+const element = <h1>Hello World</h1>;
+
+Both represent a React element, but JSX is easier to read and write. Tools such as Babel or a build compiler transform JSX into JavaScript that React can use.
+
+Real-world example: In an e-commerce application, you can use JSX to display a product name, price, and image.
+
+function Product() {
+  return (
+    <div>
+      <h2>iPhone</h2>
+      <p>Price: ₹50,000</p>
+    </div>
+  );
+}
+
+
+2. IMPORTANT JSX RULES
+----------------------
+
+RULE 1: RETURN A SINGLE PARENT ELEMENT
+
+A component's JSX must have one enclosing root element. You can use a div or a React Fragment (<>...</>).
+
+Incorrect:
+
+function App() {
+  return (
+    <h1>Hello</h1>
+    <p>Welcome</p>
+  );
+}
+
+This produces a JSX syntax error because there are two adjacent root elements.
+
+Correct using a div:
+
+function App() {
+  return (
+    <div>
+      <h1>Hello</h1>
+      <p>Welcome</p>
+    </div>
+  );
+}
+
+Correct using a Fragment:
+
+function App() {
+  return (
+    <>
+      <h1>Hello</h1>
+      <p>Welcome</p>
+    </>
+  );
+}
+
+Real-world example: A product card may contain an image, title, price, and button. All these elements belong inside one root element.
+
+Interview answer:
+"JSX requires a single enclosing root element. I can use a Fragment when I don't want to add an unnecessary DOM element."
+
+
+RULE 2: CLOSE EVERY TAG
+
+Unlike HTML, JSX requires tags to be properly closed.
+
+Incorrect:
+
+<img src="phone.jpg">
+<input type="text">
+
+Correct:
+
+<img src="phone.jpg" />
+<input type="text" />
+
+Normal elements must also have closing tags:
+
+<h1>Hello</h1>
+
+Remember: Self-closing tags like img, input, and br must end with /> in JSX.
+
+
+RULE 3: USE className INSTEAD OF class
+
+In HTML:
+
+<div class="container">Hello</div>
+
+In JSX:
+
+<div className="container">Hello</div>
+
+JSX uses JavaScript-oriented property names that correspond to DOM properties. className is the React property used for an element's CSS class.
+
+Other common differences:
+
+HTML             JSX
+----             ---
+class            className
+for              htmlFor
+onclick          onClick
+tabindex         tabIndex
+
+Example:
+
+function Login() {
+  return (
+    <div className="login-box">
+      <label htmlFor="email">Email</label>
+      <input id="email" type="email" />
+      <button onClick={() => alert("Login clicked")}>
+        Login
+      </button>
+    </div>
+  );
+}
+
+
+RULE 4: USE camelCase FOR EVENT HANDLERS AND MANY DOM PROPERTIES
+
+In JSX, event handler props use camelCase.
+
+Incorrect:
+
+<button onclick={handleClick}>Click</button>
+
+Correct:
+
+function App() {
+  function handleClick() {
+    alert("Button clicked");
+  }
+
+  return (
+    <button onClick={handleClick}>
+      Click Me
+    </button>
+  );
+}
+
+Notice that we write onClick, not onclick.
+
+We pass the function reference handleClick rather than calling handleClick() immediately during rendering.
+
+
+RULE 5: USE CURLY BRACES {} TO INSERT JAVASCRIPT EXPRESSIONS
+
+This is one of the most important JSX concepts for interviews.
+
+Curly braces let you insert JavaScript expressions inside JSX.
+
+function App() {
+  const name = "Subbu";
+  const age = 23;
+
+  return (
+    <div>
+      <h1>Hello, {name}</h1>
+      <p>Age: {age}</p>
+      <p>Next year: {age + 1}</p>
+    </div>
+  );
+}
+
+Output:
+Hello, Subbu
+Age: 23
+Next year: 24
+
+Here:
+- {name} inserts a variable's value.
+- {age} inserts a number.
+- {age + 1} evaluates a JavaScript expression.
+
+Without curly braces:
+
+<p>Age: age</p>
+
+React displays the literal text "Age: age", not the variable's value.
+
+
+3. WHAT ARE JSX EXPRESSIONS?
+----------------------------
+
+An expression is JavaScript code that produces a value.
+
+Examples:
+
+10 + 20       // 30
+name          // value of name
+age > 18      // true or false
+getName()     // return value of the function
+
+You can place expressions inside JSX using {}.
+
+COMMON TYPES OF JSX EXPRESSIONS
+
+1. Variables
+
+const product = "Laptop";
+return <h2>{product}</h2>;
+
+Output: Laptop
+
+
+2. Arithmetic expressions
+
+const price = 1000;
+return <p>Total: {price * 2}</p>;
+
+Output: Total: 2000
+
+
+3. Ternary expressions
+
+const isLoggedIn = true;
+
+return (
+  <h2>
+    {isLoggedIn ? "Welcome" : "Please log in"}
+  </h2>
+);
+
+Output: Welcome
+
+
+4. Array methods
+
+const fruits = ["Apple", "Mango"];
+
+return (
+  <ul>
+    {fruits.map((fruit) => (
+      <li key={fruit}>{fruit}</li>
+    ))}
+  </ul>
+);
+
+Output: A list containing Apple and Mango.
+
+The key prop helps React identify list items between renders. In real applications, use a stable unique ID when available.
+
+
+5. Function calls
+
+function getMessage() {
+  return "Order placed!";
+}
+
+return <p>{getMessage()}</p>;
+
+Output: Order placed!
+
+
+4. CAN WE WRITE if-else INSIDE JSX?
+-----------------------------------
+
+This is a common interview question.
+
+You cannot directly write an ordinary if-else statement inside a JSX expression.
+
+Incorrect:
+
+return (
+  <div>
+    {if (isLoggedIn) {
+      "Welcome";
+    }}
+  </div>
+);
+
+Why? Because if-else is a statement, not an expression that directly returns a value for JSX to render.
+
+Instead, use one of these approaches.
+
+APPROACH A: TERNARY OPERATOR
+
+Use it when you need to choose between two outputs.
+
+function App() {
+  const isLoggedIn = true;
+
+  return (
+    <div>
+      {isLoggedIn ? <h1>Welcome</h1> : <h1>Please log in</h1>}
+    </div>
+  );
+}
+
+
+APPROACH B: LOGICAL AND (&&)
+
+Use it when you want to display something only if a condition is true.
+
+function App() {
+  const hasNotification = true;
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      {hasNotification && <p>You have a new notification!</p>}
+    </div>
+  );
+}
+
+If hasNotification is true, the message appears. If it is false, React renders no message from that expression.
+
+IMPORTANT INTERVIEW TRAP:
+
+{count && <p>Count available</p>}
+
+If count is 0, React renders the number 0 instead of nothing.
+
+Safer version:
+
+{count > 0 && <p>Count available</p>}
+
+
+APPROACH C: USE if-else BEFORE return
+
+You can absolutely use ordinary if-else in your component's JavaScript.
+
+function App() {
+  const isLoggedIn = true;
+
+  if (isLoggedIn) {
+    return <h1>Welcome</h1>;
+  } else {
+    return <h1>Please log in</h1>;
+  }
+}
+
+This is useful when the conditions are more complicated.
+
+
+5. JSX EXPRESSIONS INSIDE ATTRIBUTES
+------------------------------------
+
+Curly braces also work in JSX attributes.
+
+DYNAMIC CLASS NAME
+
+const isActive = true;
+
+return (
+  <button className={isActive ? "active" : "inactive"}>
+    Submit
+  </button>
+);
+
+
+DYNAMIC IMAGE SOURCE
+
+const imageUrl = "/images/laptop.png";
+
+return <img src={imageUrl} alt="Laptop" />;
+
+
+DYNAMIC INLINE STYLES
+
+JSX uses a JavaScript object for inline styles, so there are two sets of braces:
+
+const headingStyle = {
+  color: "blue",
+  fontSize: "24px"
+};
+
+return <h1 style={headingStyle}>Hello</h1>;
+
+You can also write:
+
+<h1 style={{ color: "blue", fontSize: "24px" }}>
+  Hello
+</h1>
+
+The outer braces indicate a JavaScript expression, while the inner braces create the JavaScript object.
+
+Remember that CSS property names such as font-size become camelCase in a JavaScript style object: fontSize.
+
+
+6. WHAT CAN JSX RENDER FROM AN EXPRESSION?
+------------------------------------------
+
+JavaScript value                     What React displays
+-----------------                    ------------------
+"Hello"                              Hello
+25                                   25
+true or false                        Nothing by themselves
+null or undefined                    Nothing
+<h1>Hello</h1>                       The heading
+An array of React elements           The elements, usually as a list
+A plain object like { name: "Subbu" } Usually an error if rendered directly as a child
+
+Example:
+
+const name = "Subbu";
+const result = 10 + 5;
+
+return (
+  <>
+    <p>{name}</p>
+    <p>{result}</p>
+    <p>{true}</p>
+    <p>{null}</p>
+  </>
+);
+
+Visible output:
+- Subbu
+- 15
+
+The last two paragraphs contain no visible content because true and null aren't rendered as text nodes.
+
+
+7. JSX EXPRESSIONS VS JAVASCRIPT STATEMENTS
+-------------------------------------------
+
+Expression:
+- Produces a value.
+- Can be used inside JSX braces {}.
+- Examples: 10 + 5, name, isLoggedIn ? "Yes" : "No", getMessage().
+
+Statement:
+- Performs an action or controls execution.
+- Cannot be inserted directly into JSX braces {} as an expression.
+- Examples: if (age > 18) { ... }, for (...) { ... }, and declarations such as const age = 23;.
+
+Note: A function call is an expression if its result is used as a value. Declarations such as const must be placed in JavaScript code outside the JSX expression.
+
+
+8. PRACTICE QUESTIONS FOR PRODUCT-BASED COMPANY INTERVIEWS
+----------------------------------------------------------
+
+QUESTION 1: What will this render?
+
+const name = "Sam";
+<h1>name</h1>
+
+Answer: It displays the text "name". Without curly braces, name is literal text.
+
+
+QUESTION 2: Which is valid JSX?
+
+A. <img src="a.png">
+B. <img src="a.png" />
+
+Answer: B. JSX requires self-closing tags to use />.
+
+
+QUESTION 3: What appears when count is 0?
+
+{count && <p>Hello</p>}
+
+Answer: 0. The && operator returns the first falsy operand, which is 0; React renders that number.
+
+
+QUESTION 4: Can we put if-else directly inside JSX braces?
+
+Answer: No. Use a ternary expression or an if statement before return.
+
+
+QUESTION 5: Why use className?
+
+Answer: className is the JSX property used to assign CSS classes.
+
+
+9. INTERVIEW-READY SUMMARY
+--------------------------
+
+If the interviewer asks, "What are the main JSX rules?", you can say:
+
+"JSX is a syntax extension that lets us write HTML-like markup inside JavaScript. It requires a single enclosing root element, properly closed tags, and attributes such as className instead of class. We use curly braces to embed JavaScript expressions, including variables, function calls, ternary operators, and array methods. For conditional rendering, we commonly use ternary expressions or logical AND, while more complex conditions can be handled before the component's return statement."
+
+
+FINAL REVISION CHECKLIST
+------------------------
+
+[ ] Understand what JSX is and why it is used.
+[ ] Return a single root element or use a Fragment.
+[ ] Close all JSX tags correctly.
+[ ] Use className instead of class and htmlFor instead of for.
+[ ] Use camelCase event handlers such as onClick.
+[ ] Use curly braces to insert JavaScript expressions.
+[ ] Understand variables, calculations, function calls, and .map().
+[ ] Use ternary expressions or && for conditional rendering.
+[ ] Remember the count && trap when count is 0.
+[ ] Use stable keys when rendering lists.
+[ ] Understand dynamic attributes and inline styles.
+[ ] Know the difference between an expression and a statement.
+
+RECOMMENDATION
+--------------
+
+Practice these four concepts especially well: root elements, curly braces, conditional rendering, and .map() with keys. They are fundamental to building React interfaces and explaining JSX confidently in interviews.
