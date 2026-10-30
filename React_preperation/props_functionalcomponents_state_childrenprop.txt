@@ -1,0 +1,981 @@
+
+
+Topics:
+1. Functional Components and Component Composition
+2. Props and One-Way Data Flow
+3. Props vs State
+4. Children Prop and Composition Patterns
+
+Purpose
+-------
+These notes are designed for React interviews, especially SDE-1 roles.
+For each concept, understand:
+- What it means
+- Why React applications use it
+- How it works
+- A practical example
+- Common mistakes and interview follow-ups
+
+==========================================================
+1. FUNCTIONAL COMPONENTS
+==========================================================
+
+INTERVIEW-READY ANSWER
+----------------------
+A functional component is a JavaScript function that returns React elements,
+usually written using JSX, to describe a part of the user interface. Functional
+components can receive data through props and use React Hooks such as useState
+and useEffect when they need state or effect-related behavior. They help us
+split an application into small, reusable, and maintainable UI units.
+
+WHAT PROBLEM DO THEY SOLVE?
+---------------------------
+If an entire application is written inside one large component, the code becomes
+hard to understand, test, debug, and maintain. Functional components let us
+separate the UI into smaller parts, each with a clear responsibility.
+
+EXAMPLE
+-------
+function Welcome() {
+  return <h1>Welcome to React!</h1>;
+}
+
+function App() {
+  return (
+    <div>
+      <Welcome />
+    </div>
+  );
+}
+
+export default App;
+
+HOW IT WORKS
+------------
+1. Welcome is a JavaScript function.
+2. It returns JSX describing the heading.
+3. App uses Welcome through <Welcome />.
+4. React renders the returned UI as part of the page.
+
+FUNCTIONAL COMPONENT WITH PROPS
+-------------------------------
+function Student({ name, course }) {
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>{course}</p>
+    </div>
+  );
+}
+
+function App() {
+  return <Student name="Subbu" course="Computer Science" />;
+}
+
+The same Student component can display different students by receiving
+different prop values.
+
+FUNCTIONAL COMPONENT WITH STATE
+-------------------------------
+import { useState } from "react";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(prev => prev + 1)}>
+        Increase
+      </button>
+    </div>
+  );
+}
+
+A functional component can use Hooks. useState stores a value between renders.
+Calling its setter requests a state update and causes React to render the
+component again when appropriate.
+
+IMPORTANT RULES
+---------------
+- Component names should start with a capital letter.
+- A component should return valid React content.
+- Components should generally have a clear responsibility.
+- Call Hooks at the top level of a function component or custom Hook.
+- Do not call Hooks conditionally, inside loops, or inside nested functions.
+- A component should be rendered as <Component />, not called like an ordinary
+  function in application code.
+
+WHY PRODUCT COMPANIES CARE
+--------------------------
+- Reusability: the same component can appear in many places.
+- Maintainability: a focused component is easier to change.
+- Testability: smaller units can be tested independently.
+- Collaboration: developers can work on separate UI components.
+- Consistency: shared components help maintain a consistent interface.
+
+FOLLOW-UP INTERVIEW QUESTIONS
+------------------------------
+Q: Can a functional component have state?
+A: Yes. Functional components can use Hooks such as useState to manage state.
+
+Q: Are functional components only for displaying static UI?
+A: No. They can receive props, manage state, handle events, and use Hooks.
+
+Q: What is the difference between a component and an ordinary function?
+A: A React component is a function used by React to describe UI. It follows
+   component and Hook rules and is rendered through React.
+
+==========================================================
+2. COMPONENT COMPOSITION
+==========================================================
+
+INTERVIEW-READY ANSWER
+----------------------
+Component composition is the practice of building a larger user interface by
+combining smaller, focused components. Instead of putting an entire page into
+one large component, we create reusable components such as Navbar, Sidebar,
+ProductList, ProductCard, and Footer, and combine them to form the page.
+Composition improves separation of concerns, reusability, readability, and
+maintainability.
+
+REAL-WORLD EXAMPLE
+------------------
+An e-commerce page can be composed from:
+- Navbar
+- SearchBar
+- CategoryFilter
+- ProductList
+- ProductCard
+- CartSummary
+- Footer
+
+Each component handles a focused part of the UI. App combines them.
+
+EXAMPLE
+-------
+function Navbar() {
+  return <h2>My Shopping Website</h2>;
+}
+
+function ProductCard() {
+  return (
+    <div>
+      <h3>Laptop</h3>
+      <p>Price: Rs. 50000</p>
+    </div>
+  );
+}
+
+function Footer() {
+  return <p>Thank you for shopping!</p>;
+}
+
+function App() {
+  return (
+    <div>
+      <Navbar />
+      <ProductCard />
+      <Footer />
+    </div>
+  );
+}
+
+Here, App composes three smaller components into one page.
+
+COMPOSITION IS NOT THE SAME AS CHILDREN
+---------------------------------------
+Composition is the broader design approach: combining components to build UI.
+The children prop is one technique that makes composition flexible. Components
+can also be composed by rendering named child components or passing components
+as props.
+
+WHY COMPOSITION IS USEFUL
+-------------------------
+- Avoids giant components.
+- Encourages reuse of shared UI.
+- Makes responsibilities clearer.
+- Allows a component to be changed without rewriting the whole page.
+- Makes testing and team collaboration easier.
+
+COMPOSITION VS INHERITANCE
+--------------------------
+React commonly favors composition: build complex UI by combining components
+and passing props, rather than creating deep inheritance hierarchies.
+
+INTERVIEW FOLLOW-UP
+-------------------
+Q: Why not write the whole page in one component?
+A: A very large component becomes difficult to maintain, test, and reuse.
+   Composition divides the UI into focused units with clear responsibilities.
+
+==========================================================
+3. PROPS
+==========================================================
+
+INTERVIEW-READY ANSWER
+----------------------
+Props, short for properties, are inputs passed from a parent component to a
+child component. They allow a component to receive data or behavior from its
+parent, making it reusable for different values. Props are read-only from the
+receiving component's perspective; a child should not directly mutate them.
+
+EXAMPLE
+-------
+function ProductDetails({ name, price }) {
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>Price: Rs. {price}</p>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div>
+      <ProductDetails name="Laptop" price={50000} />
+      <ProductDetails name="Headphones" price={2000} />
+    </div>
+  );
+}
+
+The same ProductDetails component is reused with different props.
+
+WHAT ARE PROPS IN THE CHILD?
+----------------------------
+In this example:
+
+<ProductDetails name="Laptop" price={50000} />
+
+The child receives an object conceptually similar to:
+
+{
+  name: "Laptop",
+  price: 50000
+}
+
+It can access the values using props.name and props.price, or use destructuring:
+
+function ProductDetails({ name, price }) {
+  return <p>{name}: Rs. {price}</p>;
+}
+
+PROPS CAN CONTAIN
+-----------------
+- Strings and numbers
+- Booleans
+- Arrays and objects
+- Functions (often callback functions)
+- React elements / JSX
+- Other values supported by the component's API
+
+PROPS ARE READ-ONLY
+-------------------
+Incorrect:
+function Profile(props) {
+  props.name = "Rahul"; // Do not mutate props
+  return <h2>{props.name}</h2>;
+}
+
+The child should treat props as immutable inputs. If a value needs to change,
+the component that owns that value should update its state and pass the new
+value down through props.
+
+==========================================================
+4. ONE-WAY DATA FLOW
+==========================================================
+
+INTERVIEW-READY ANSWER
+----------------------
+One-way data flow means that data is passed from parent components to child
+components, usually through props. The component that owns the data controls
+it and passes the values needed by its children. If a child needs to request a
+change, the parent can pass a callback function as a prop. The child calls the
+callback, and the parent decides whether to update its state. This makes data
+ownership and updates more predictable.
+
+BASIC FLOW
+----------
+Parent state or data
+        |
+        | passes values through props
+        v
+Child component displays the values
+
+EXAMPLE: PARENT PASSES DATA TO CHILD
+------------------------------------
+function Profile({ username }) {
+  return <h2>Welcome, {username}!</h2>;
+}
+
+function App() {
+  const username = "Subbu";
+
+  return <Profile username={username} />;
+}
+
+The data moves from App to Profile.
+
+WHY ONE-WAY DATA FLOW?
+----------------------
+- Makes it easier to identify where data comes from.
+- Makes data ownership clearer.
+- Helps prevent children from unexpectedly changing parent data.
+- Makes debugging more predictable.
+- Supports a clear component hierarchy.
+
+IMPORTANT: CHILD-TO-PARENT COMMUNICATION
+----------------------------------------
+The data flow is down, but a child can notify a parent by calling a function
+that the parent passed as a prop. This is often called callback communication.
+
+EXAMPLE: CHILD REQUESTS A PARENT UPDATE
+---------------------------------------
+import { useState } from "react";
+
+function Profile({ onChangeName }) {
+  return (
+    <button onClick={() => onChangeName("Rahul")}>
+      Change name
+    </button>
+  );
+}
+
+function App() {
+  const [name, setName] = useState("Subbu");
+
+  return (
+    <div>
+      <h2>{name}</h2>
+      <Profile onChangeName={setName} />
+    </div>
+  );
+}
+
+EXPLANATION
+-----------
+1. App owns the name state.
+2. App passes setName to Profile as the onChangeName prop.
+3. Profile calls onChangeName("Rahul") after the click.
+4. The parent's state is updated.
+5. React renders the updated UI and passes the new value to any children
+   that receive it.
+
+The child does not directly modify the parent's state. It calls a function
+provided by the parent.
+
+==========================================================
+5. PROPS VS STATE
+==========================================================
+
+INTERVIEW-READY ANSWER
+----------------------
+Props and state both influence what a component renders, but they have different
+roles. Props are inputs received from a parent component, while state is data
+owned and managed by a component. A component should treat props as read-only.
+It updates its own state using a setter, such as the function returned by
+useState. When state changes, React can render the component again to reflect
+the new value.
+
+COMPARISON
+----------
+Props:
+- Inputs received from a parent.
+- Controlled by the component that passes them.
+- Read-only to the receiving child.
+- Used to configure a component and pass data or callbacks.
+- Can receive a new value when the parent renders with updated data.
+
+State:
+- Data owned by a component (or by a chosen state owner).
+- Updated through a state setter or another React state mechanism.
+- Used for information that changes over time.
+- Updating state can cause React to render the component again.
+- Should be updated immutably, not by directly mutating an object or array.
+
+EXAMPLE: STATE IN PARENT, PROP IN CHILD
+---------------------------------------
+import { useState } from "react";
+
+function Profile({ username }) {
+  return <h2>Welcome, {username}!</h2>;
+}
+
+function App() {
+  const [name, setName] = useState("Subbu");
+
+  return (
+    <div>
+      <Profile username={name} />
+      <button onClick={() => setName("Rahul")}>
+        Change name
+      </button>
+    </div>
+  );
+}
+
+IMPORTANT OBSERVATION
+---------------------
+The same information can be state in one component and a prop in another.
+In App, name is state because App owns and updates it. In Profile, username is
+a prop because Profile receives it from its parent.
+
+WHEN TO USE PROPS
+-----------------
+Use props when a component needs information or a callback from its parent.
+Examples:
+- Product name and price passed to ProductCard.
+- A label passed to a reusable Button.
+- A callback passed to a child to report an event.
+
+WHEN TO USE STATE
+-----------------
+Use state when a component (or its chosen owner) needs to remember changing
+information between renders.
+Examples:
+- Whether a modal is open.
+- Text entered in a form.
+- Selected filter.
+- Cart items or quantity.
+- Current tab selection.
+
+COMMON MISTAKE: MUTATING STATE DIRECTLY
+---------------------------------------
+Incorrect:
+const [user, setUser] = useState({ name: "Subbu", age: 22 });
+
+function updateAge() {
+  user.age = 23;
+  setUser(user);
+}
+
+This mutates the existing object and passes the same object reference back.
+React may treat the state as unchanged because the reference is the same.
+
+Correct:
+function updateAge() {
+  setUser(prev => ({
+    ...prev,
+    age: 23
+  }));
+}
+
+The spread creates a new object while preserving the other properties.
+
+==========================================================
+6. CHILDREN PROP
+==========================================================
+
+INTERVIEW-READY ANSWER
+----------------------
+The children prop is a special React prop that represents the content nested
+between a component's opening and closing tags. A component can render this
+content wherever it uses {children}. It is useful for creating flexible,
+reusable wrappers such as Card, Modal, Panel, and PageLayout components because
+the wrapper controls the structure while the caller supplies the content.
+
+EXAMPLE
+-------
+function Card({ children }) {
+  return (
+    <div className="card">
+      {children}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Card>
+      <h2>Laptop</h2>
+      <p>Price: Rs. 50000</p>
+      <button>Buy Now</button>
+    </Card>
+  );
+}
+
+HOW IT WORKS
+------------
+1. App renders Card with nested JSX.
+2. React makes that nested content available as the Card component's children
+   prop.
+3. Card renders {children} inside its wrapper.
+4. The nested heading, paragraph, and button appear inside the card.
+
+REUSING THE SAME CARD
+---------------------
+<Card>
+  <h2>Laptop</h2>
+  <p>Rs. 50000</p>
+</Card>
+
+<Card>
+  <h2>Mobile</h2>
+  <p>Rs. 25000</p>
+</Card>
+
+The Card controls the shared wrapper, while each caller supplies different
+content.
+
+EXAMPLE: PAGE LAYOUT
+--------------------
+function PageLayout({ children }) {
+  return (
+    <div>
+      <header>My Website</header>
+      <main>{children}</main>
+      <footer>Contact Us</footer>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <PageLayout>
+      <h2>Home Page</h2>
+      <p>Welcome to my website!</p>
+    </PageLayout>
+  );
+}
+
+The layout owns the common header, main area, and footer. The caller chooses
+what content appears inside the main area.
+
+IMPORTANT DETAILS
+----------------
+- children is a prop; it is not a separate language feature.
+- It can contain elements, text, numbers, arrays of nodes, or other renderable
+  React content.
+- A component can render children zero, one, or multiple times.
+- A component does not have to use children.
+- Use named props when the component needs specific, separately identified
+  values. Use children when it needs flexible nested content.
+
+==========================================================
+7. COMPOSITION PATTERNS
+==========================================================
+
+A. COMPONENTS AS CHILDREN
+-------------------------
+Use children when a component provides a wrapper or layout and callers choose
+the nested content.
+
+function Panel({ children }) {
+  return <section className="panel">{children}</section>;
+}
+
+B. NAMED COMPONENTS AS PROPS
+----------------------------
+Sometimes a component needs several distinct content areas. You can pass
+React elements through named props.
+
+function Dialog({ title, actions, children }) {
+  return (
+    <div className="dialog">
+      <h2>{title}</h2>
+      <div>{children}</div>
+      <div>{actions}</div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Dialog
+      title="Delete item?"
+      actions={<button>Confirm</button>}
+    >
+      <p>This action cannot be undone.</p>
+    </Dialog>
+  );
+}
+
+Here:
+- title is a normal data prop.
+- children is the main nested content.
+- actions is a named prop containing JSX.
+
+C. COMPOUND COMPONENTS (INTRODUCTORY)
+-------------------------------------
+Compound components are a pattern where related components work together
+under a common parent API. For example:
+
+<Tabs>
+  <Tabs.List>
+    <Tabs.Tab>Overview</Tabs.Tab>
+    <Tabs.Tab>Reviews</Tabs.Tab>
+  </Tabs.List>
+  <Tabs.Panel>...</Tabs.Panel>
+</Tabs>
+
+This can create a clear, expressive API for related UI pieces. More advanced
+implementations may use Context to share state between the compound components.
+
+D. COMPONENT COMPOSITION VS INHERITANCE
+---------------------------------------
+Composition builds UI by combining components and passing data or elements.
+React generally encourages composition over deep inheritance hierarchies.
+
+==========================================================
+8. LIFTING STATE UP AND PROP DRILLING
+==========================================================
+
+LIFTING STATE UP
+----------------
+When multiple components need to read or update the same state, move that state
+to their nearest common parent. The parent passes the current value and
+callbacks to the children that need them.
+
+Example:
+App owns cartCount.
+Navbar receives cartCount and displays it.
+ProductList receives an onAdd callback and calls it when a product is added.
+
+This keeps one shared source of truth for the state.
+
+PROP DRILLING
+-------------
+Prop drilling means passing props through intermediate components that do not
+need the data themselves, only so a deeply nested component can receive it.
+
+Example:
+App -> Dashboard -> Profile -> UserDetails
+
+If only UserDetails needs username, Dashboard and Profile may have to pass it
+along. This can make component APIs noisy as the tree grows.
+
+POSSIBLE SOLUTIONS
+------------------
+- Component composition: restructure components so the owner can pass the
+  required UI directly.
+- React Context: provide values to components deeper in the tree without
+  manually passing props through every intermediate level.
+- A state management library may be useful for larger application-wide needs.
+
+Do not assume Context is always better. For simple parent-child relationships,
+ordinary props are often clearer. Context is useful when many distant
+components need the same information.
+
+==========================================================
+9. STATE UPDATES, BATCHING, AND IMMUTABILITY
+==========================================================
+
+STATE SETTER
+------------
+const [count, setCount] = useState(0);
+
+setCount(5);
+
+Calling the setter requests an update. Do not expect the state variable in the
+currently executing function to change immediately. It represents the state
+snapshot for that render.
+
+FUNCTIONAL STATE UPDATE
+-----------------------
+setCount(prevCount => prevCount + 1);
+
+Use the functional form when the next state depends on the previous state,
+especially when making multiple updates.
+
+BATCHING
+--------
+React can group multiple state updates into a single render for efficiency.
+For example:
+
+function handleClick() {
+  setCount(count + 1);
+  setName("Rahul");
+}
+
+React commonly batches these updates so it does not need to render separately
+for every setter in the same event.
+
+IMPORTANT: THREE UPDATES
+------------------------
+const [count, setCount] = useState(0);
+
+function increase() {
+  setCount(count + 1);
+  setCount(count + 1);
+  setCount(count + 1);
+}
+
+In this example, all three expressions use the same count value from the
+current render. If count is 0, each requests the value 1. The final result is
+1, not 3.
+
+Correct:
+function increase() {
+  setCount(prev => prev + 1);
+  setCount(prev => prev + 1);
+  setCount(prev => prev + 1);
+}
+
+The updater functions are processed in sequence, so the count increases by 3.
+
+IMMUTABILITY
+------------
+Treat objects and arrays stored in React state as immutable. Instead of
+changing an existing object or array, create a new one.
+
+Update an object:
+setUser(prev => ({
+  ...prev,
+  age: 23
+}));
+
+Add to an array:
+setItems(prev => [...prev, newItem]);
+
+Remove from an array:
+setItems(prev => prev.filter(item => item.id !== id));
+
+Update an array item:
+setItems(prev =>
+  prev.map(item =>
+    item.id === id
+      ? { ...item, price: 2000 }
+      : item
+  )
+);
+
+WHY IMMUTABILITY?
+-----------------
+- Makes state changes easier to reason about.
+- Preserves previous object/array values.
+- Helps React detect changes through reference comparisons.
+- Reduces accidental side effects.
+- Makes debugging and predictable rendering easier.
+
+Remember: the spread operator makes a shallow copy. If nested objects are
+changed, copy each level that needs updating.
+
+==========================================================
+10. REAL-WORLD DESIGN EXAMPLE: SHOPPING CART
+==========================================================
+
+A typical component structure:
+
+App
+ |-- Navbar
+ |-- ProductList
+ |    |-- ProductCard
+ |    |-- ProductCard
+ |-- CartSummary
+
+Possible state ownership:
+- App owns the cart state if both Navbar and ProductList need it.
+- App passes cart count to Navbar.
+- App passes an add-to-cart callback to ProductList or ProductCard.
+- ProductCard calls the callback when the user clicks Add to Cart.
+- App updates cart state immutably.
+- React renders components with the new values.
+
+This example combines:
+- Functional components
+- Component composition
+- Props
+- One-way data flow
+- Callback props
+- Lifting state up
+- State updates and immutable array operations
+
+==========================================================
+11. COMMON INTERVIEW QUESTIONS AND ANSWERS
+==========================================================
+
+Q1. What are functional components?
+A: Functional components are JavaScript functions that return React elements
+   describing UI. They can receive props and use Hooks to manage state and
+   other React behavior.
+
+Q2. What is component composition?
+A: It is the practice of combining smaller, focused components to build a
+   larger UI. It improves reuse, readability, and maintainability.
+
+Q3. What are props?
+A: Props are read-only inputs passed from a parent component to a child. They
+   allow components to receive data and callbacks and be reused with different
+   values.
+
+Q4. What is one-way data flow?
+A: Data is passed from parent to child through props. A child can notify the
+   parent by calling a callback passed as a prop, while the parent remains
+   responsible for updating its own state.
+
+Q5. What is the difference between props and state?
+A: Props are inputs received from a parent; state is data owned by a component.
+   Props are read-only to the receiver, while state is updated through its
+   setter or another React state mechanism.
+
+Q6. Can a child change props?
+A: No. A child should not mutate props. The parent can update its state and
+   pass a new prop value.
+
+Q7. How can a child communicate with a parent?
+A: The parent passes a callback function as a prop. The child calls that
+   callback to report an event or request an update.
+
+Q8. What is the children prop?
+A: It contains the content nested between a component's opening and closing
+   tags. The component can render it using {children}.
+
+Q9. Is children the same as component composition?
+A: No. Composition is the broader practice of combining components. Children
+   is one common mechanism for passing nested content into a component.
+
+Q10. What is lifting state up?
+A: Moving shared state to the nearest common parent so multiple child
+    components can use and update the same source of truth.
+
+Q11. What is prop drilling?
+A: Passing props through intermediate components that do not need the values,
+    only to deliver them to a deeply nested component.
+
+Q12. Why use functional state updates?
+A: They calculate the next state from the previous state and avoid relying on
+    a potentially outdated state value in the current render.
+
+Q13. What is batching?
+A: React groups multiple state updates so it can process them efficiently and
+    reduce unnecessary renders.
+
+Q14. Why should state be updated immutably?
+A: Creating new objects or arrays makes changes predictable and allows React
+    to detect new references. Direct mutation can cause updates to be missed
+    or make behavior difficult to reason about.
+
+==========================================================
+12. COMMON MISTAKES TO AVOID
+==========================================================
+
+1. Mutating props inside a child.
+2. Directly changing state variables.
+3. Updating an object or array in state without creating a new reference.
+4. Using state for values that can simply be calculated from existing props
+   or state, causing unnecessary duplicated data.
+5. Keeping shared state in separate sibling components when they need one
+   common source of truth.
+6. Using Context for every prop, even when simple props are clearer.
+7. Confusing callback communication with direct child ownership of parent state.
+8. Assuming every state setter immediately changes the state variable in the
+   currently running function.
+9. Assuming three setCount(count + 1) calls always add three.
+10. Creating one giant component instead of composing smaller components.
+
+==========================================================
+13. HANDS-ON PRACTICE TASKS
+==========================================================
+
+FUNCTIONAL COMPONENTS AND COMPOSITION
+-------------------------------------
+1. Create Navbar, ProductList, ProductCard, and Footer components.
+2. Combine them inside App.
+3. Reuse ProductCard for three different products.
+4. Create a reusable PageLayout component.
+
+PROPS AND ONE-WAY DATA FLOW
+---------------------------
+5. Pass student name, age, and course from parent to child.
+6. Pass product name, price, and availability to a ProductCard.
+7. Store username in parent state and pass it to a Profile child.
+8. Update the parent state and observe the new child prop.
+
+PROPS VS STATE
+--------------
+9. Create a counter using useState.
+10. Create a login/logout toggle.
+11. Create a show/hide password component.
+12. Create a controlled form with name and email fields.
+
+CALLBACKS AND LIFTING STATE
+---------------------------
+13. Pass an increment callback from parent to child.
+14. Let a child send search text to its parent.
+15. Let a child request deletion of a product.
+16. Build two sibling components that share a counter.
+17. Build a Navbar and ProductList that share cart state.
+
+CHILDREN AND COMPOSITION PATTERNS
+---------------------------------
+18. Create a Card component using children.
+19. Create a Modal that accepts different nested content.
+20. Create a PageLayout with header, children, and footer.
+21. Create a Dialog with title, children, and an actions prop.
+
+STATE UPDATES AND IMMUTABILITY
+------------------------------
+22. Increment a counter three times using functional updates.
+23. Update a user object immutably.
+24. Add and remove tasks from an array.
+25. Update a product's price using map.
+26. Toggle a task's completed status immutably.
+
+REAL-WORLD MINI PROJECTS
+------------------------
+27. Shopping cart with add, remove, quantity, and total price.
+28. Registration form with controlled inputs and validation.
+29. Product listing with search, category filter, and sorting.
+30. Task manager with add, delete, complete, and filter features.
+
+==========================================================
+14. HOW TO ANSWER IN A PRODUCT-BASED COMPANY INTERVIEW
+==========================================================
+
+For a conceptual question, use this answer structure:
+
+1. Definition:
+   Give a precise, direct definition.
+
+2. Purpose:
+   Explain the problem the concept solves.
+
+3. Working:
+   Explain the data flow or behavior.
+
+4. Example:
+   Give a small practical example.
+
+5. Trade-off or best practice:
+   Mention when to use it and what mistakes to avoid.
+
+Example: "Explain props."
+
+"Props are read-only inputs passed from a parent component to a child
+component. They help us reuse the same component with different data. For
+example, an e-commerce application can use one ProductCard component for
+multiple products by passing each product's name and price as props. If the
+data changes, the parent can update its state and pass the new value down.
+This follows React's one-way data flow."
+
+INTERVIEW PREPARATION CHECKLIST
+-------------------------------
+You are ready to move forward when you can:
+[ ] Explain each concept without memorizing a paragraph.
+[ ] Draw the parent-child data flow.
+[ ] Write a small example without a tutorial.
+[ ] Explain who owns and updates the state.
+[ ] Explain how callbacks let children notify parents.
+[ ] Explain when to lift state up.
+[ ] Explain the difference between children and composition.
+[ ] Update objects and arrays immutably.
+[ ] Explain batching and functional state updates.
+[ ] Build the shopping cart, form, and product filter independently.
+
+FINAL REVISION
+--------------
+Functional component = a function that describes UI.
+Component composition = combining smaller components into a larger UI.
+Props = read-only inputs received from a parent.
+One-way data flow = data flows from parent to child through props.
+State = data owned and managed by a component.
+Callback prop = a function passed down so a child can notify the parent.
+Lifting state up = moving shared state to the nearest common parent.
+Prop drilling = passing props through components that do not need them.
+Children = nested content received through the children prop.
+Immutability = create new objects/arrays instead of mutating existing state.
+Batching = grouping state updates for efficient rendering.
+
+END OF NOTES
+============
