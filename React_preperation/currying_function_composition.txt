@@ -1,0 +1,132 @@
+1. Currying in JavaScript
+Currying is a technique in JavaScript where we convert a function that takes multiple arguments into a sequence of functions, where each function takes one argument at a time.
+In simple words:
+Instead of passing all arguments at once, we pass them one by one.
+
+Example 1: Without currying
+function add(a, b, c) {
+    return a + b + c;
+}
+console.log(add(10, 20, 30)); // 60
+
+Here:
+- The function accepts three arguments.
+- All arguments are passed at the same time.
+Example 2: With currying
+function add(a) {
+    return function(b) {
+        return function(c) {
+            return a + b + c;
+        }
+    }
+}
+
+console.log(add(10)(20)(30)); // 60
+
+Example 3: Real-world example – Discount calculation
+Imagine an e-commerce application where you want to apply different discounts to products.
+
+function discount(percentage) {
+    return function(price) {
+        return price - (price * percentage / 100);
+    }
+}
+
+const tenPercentDiscount = discount(10);
+const twentyPercentDiscount = discount(20);
+
+console.log(tenPercentDiscount(1000));  // 900
+console.log(twentyPercentDiscount(1000)); // 800
+
+What is happening?
+1. discount(10) creates a function that applies a 10% discount.
+2. discount(20) creates a function that applies a 20% discount.
+3. We can reuse these functions for different products.
+This is useful when you want to create reusable functions with some arguments already configured.
+Why do we use currying?
+1. Code reusability.
+2. Function customization.
+3. Avoid passing the same arguments repeatedly.
+4. Supports function composition.
+5. Helps in functional programming.
+
+Normal function	                                         Curried function
+Accepts multiple arguments together	             Accepts arguments one at a time
+add(10, 20)	                                             add(10)(20)
+Single function call	                                  Multiple function calls
+
+
+2. Function Composition in JavaScript
+Function composition is a technique of combining two or more functions to create a new function.
+
+The output of one function becomes the input of another function.
+
+In simple words:
+
+One function performs an operation, and its result is passed to the next function.
+Example 1: Without function composition
+Suppose we have two functions:
+function double(num) {
+    return num * 2;
+}
+
+function addFive(num) {
+    return num + 5;
+}
+
+let result = double(10);
+result = addFive(result);
+
+console.log(result); // 25
+
+Here:
+1. double(10) returns 20.
+2. addFive(20) returns 25.
+Example 2: With function composition
+We can combine both functions into a single function.
+
+function double(num) {
+    return num * 2;
+}
+
+function addFive(num) {
+    return num + 5;
+}
+
+function compose(f, g) {
+    return function(value) {
+        return f(g(value));
+    }
+}
+const result = compose(addFive, double);
+console.log(result(10)); // 25
+
+
+3. Difference between Currying and Function Composition
+This is an important interview question.
+  
+Currying	                                                                           Function Composition
+Converts a multi-argument function into nested single-argument functions.	          Combines multiple functions into one function.
+Focuses on how arguments are passed.	                                              Focuses on how functions are combined.
+Example: add(10)(20)	                                                               Example: double(addFive(10))
+Helps with function reuse and partial configuration.	                               Helps build reusable processing pipelines.
+
+Remember this simple difference:
+- Currying = One argument at a time.
+- Composition = One function's output becomes another function's input.
+
+4. Important interview concepts
+You should also understand these related concepts:
+
+1. Partial Application
+Creating a new function by fixing some arguments of an existing function.
+
+2. Higher-Order Functions
+A function that accepts another function as an argument or returns another function.
+
+3. Pure Functions
+A function that always produces the same output for the same input and does not cause side effects.
+
+These concepts are closely related to functional programming in JavaScript.
+
+
